@@ -4,9 +4,7 @@ import Header from './components/Header.vue'
 </script>
 
 <template>
-  <TopBar />
-  <SideBar />
-  <MainBox />
+  <Header />
   <HelloWorld />
 </template>
 
