@@ -8,7 +8,7 @@
         <i class="fa-solid fa-pen"></i>
         <span>Compose</span>
       </button>
-    </div>
+    </div>a
   </div>
 </template>
 
