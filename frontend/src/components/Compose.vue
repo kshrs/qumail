@@ -2,6 +2,9 @@
   <div class="compose-view">
     <div class="compose-header">
       <h3>New Message</h3>
+      <div class="compose-controls">
+        <button class="close-btn" @click="$emit('close')" title="Close">×</button>
+      </div>
     </div>
     <div class="compose-body">
       <div class="form-group">
