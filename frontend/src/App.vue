@@ -12,9 +12,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import Compose from './components/Compose.vue';
+import TopBar from './components/TopBar.vue';
 
 const isComposeOpen = ref(false);
 const openCompose = () => (isComposeOpen.value = true);
