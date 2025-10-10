@@ -1,13 +1,18 @@
 package main
 
 import (
+	"os"
+	"log"
 	"context"
 	"fmt"
+	"github.com/joho/godotenv"
+	"errors"
 )
 
 // App struct
 type App struct {
 	ctx context.Context
+	mail *Mail
 }
 
 // NewApp creates a new App application struct
@@ -19,9 +24,68 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	
+	// Load the dot env files
+	godotenv.Load()
+	usermail := os.Getenv("EMAIL")
+	password := os.Getenv("APP_PASSWORD")
+
+	// Connect with the mail client
+	m, err := NewMail(usermail, password)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	err = m.Connect("imap.gmail.com:993")
+	if err != nil {
+		log.Fatal(err)
+	}
+	a.mail = m
+
 }
 
 // Greet returns a greeting for the given name
 func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
+}
+
+func (a *App) FetchEmails() ([]Email, error) {
+	if a.mail == nil {
+		return nil, errors.New("not connected to the mail server")
+	}
+	messages, err := a.mail.GetMessages("INBOX", 10)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+
+	var emails []Email
+	for _, msg := range messages {
+		if msg.Envelope == nil {
+			continue
+		}
+
+		from := ""
+		if len(msg.Envelope.From) > 0 {
+			addr := msg.Envelope.From[0]
+			from = fmt.Sprintf("%s <%s@%s>",addr.PersonalName, addr.MailboxName, addr.HostName)
+		}
+
+		email := Email{
+			From: from,
+			Subject: msg.Envelope.Subject,
+			Date: msg.Envelope.Date.Format("02 Jan 2006 15:04"),
+		}
+		emails = append(emails, email)
+	}
+	
+	return emails, nil
+
+}
+
+
+func (a *App) shutdown(ctx context.Context) {
+	if a.mail != nil {
+		a.mail.Disconnect()
+	}
 }
