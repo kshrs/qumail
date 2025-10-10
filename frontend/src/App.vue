@@ -17,12 +17,15 @@
         </div>
       </div>
     </div>
+  <TopBar />
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import Compose from './components/Compose.vue';
+import Inbox from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';
 
@@ -31,6 +34,7 @@ const sidebarOpen = ref(false);
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value;
 }
+
 
 const isComposeOpen = ref(false);
 

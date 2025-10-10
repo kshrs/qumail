@@ -1,4 +1,4 @@
-/* NO CHANGES to your existing styles */
+
 .compose-view {
   width: 100%;
   height: 100%;
@@ -364,70 +364,16 @@
   color: #cdcccb;
   white-space: nowrap; /* Prevents text wrapping during transition */
 }
-
-.toggle-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 20px;
-  color: #5f6368;
-  padding: 8px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.btn-confirm-send:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
 }
-
-.toggle-btn:hover {
-  background-color: #e8e8e8;
+.btn-alert-ok {
+  background-color: #3498db;
+  color: white;
+  min-width: 100px;
 }
-
-/*
- * Menu styles
- */
-.menu {
-  flex-grow: 1;
-  padding-top: 10px;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  margin: 0 12px;
-  padding: 10px 12px;
-  border-radius: 20px;
-  color: #3c4043;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  white-space: nowrap; /* Prevents text wrapping */
-}
-
-.menu-item i {
-  width: 24px;
-  margin-right: 20px;
-  font-size: 18px;
-  text-align: center;
-}
-
-.menu-item span {
-  font-size: 14px;
-  font-weight: 500;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.menu-item:hover {
-  background-color: #e8e8e8;
-}
-
-.menu-item.active {
-  background-color: #d3e3fd;
-  color: #1a73e8;
-  font-weight: 600;
-}
-
-/*
- * Footer / Compose button styles
- */
-.sidebar-footer {
-  padding: 20px;
+.btn-alert-ok:hover {
+  background-color: #2980b9;
 }
