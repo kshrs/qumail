@@ -1,4 +1,5 @@
 <template>
+  <TopBar />
   <div id="app">
     <div v-if="isComposeOpen">
       <Compose @close="closeCompose" />

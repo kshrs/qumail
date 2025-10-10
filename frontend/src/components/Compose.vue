@@ -32,20 +32,13 @@
         </div>
       </div>
     </div>
-    <input
-      type="file"
-      multiple
-      ref="fileInput"
-      @change="handleFileSelection"
-      style="display: none"
-    />
     <div class="compose-footer">
       <button class="send-btn" @click="sendEmail">
         <span>Send</span>
         <i class="fa-solid fa-paper-plane"></i>
       </button>
       <div class="footer-options">
-        <button class="options-btn" @click="triggerFileInput" title="Attach files">
+        <button class="options-btn" @click="addAttachments" title="Attach files">
           <i class="fa-solid fa-paperclip"></i>
         </button>
         <button class="options-btn" @click="showConfirmDialog = true" title="Discard draft">
@@ -71,7 +64,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { SendEmail } from '../../wailsjs/go/main/App';
+import { SendEmail, PickFiles } from '../../wailsjs/go/main/App';
 
 const emit = defineEmits(['close']);
 
@@ -84,67 +77,61 @@ const showCc = ref(false);
 const showBcc = ref(false);
 
 const attachments = ref([]);
-const fileInput = ref(null);
 
 // CHANGE 3: New state variable to control the dialog's visibility
 const showConfirmDialog = ref(false);
 
-const triggerFileInput = () => {
-  fileInput.value.click();
-};
 
-const handleFileSelection = (event) => {
-  const selectedFiles = Array.from(event.target.files);
-  attachments.value.push(...selectedFiles);
-  event.target.value = '';
-};
-
-const removeAttachment = (index) => {
-  attachments.value.splice(index, 1);
-};
-
-// CHANGE 4: New function to handle the confirmation action
 const confirmDiscard = () => {
   showConfirmDialog.value = false; // Hide the dialog
   emit('close'); // Perform the original close action
 };
 
+// Attach files
+const addAttachments = async () => {
+  try {
+    const filePaths = await PickFiles();
+    
+    if (filePaths) {
+      // Create objects with a 'name' (for display) and 'path' (to send to Go)
+      const newAttachments = filePaths.map(path => {
+        const parts = path.split(/[\\/]/); // Handles both Windows and Unix paths
+        return { name: parts[parts.length - 1], path: path };
+      });
+      attachments.value.push(...newAttachments);
+    }
+  } catch (err) {
+    console.error("Error selecting files:", err);
+  }
+};
+
+// Detach Files
+const removeAttachment = (index) => {
+  attachments.value.splice(index, 1);
+};
+
+// Send Email with attachments
 const sendEmail = async () => {
   if (!to.value.trim()) {
     alert('Please enter at least one recipient in the "To" field.');
     return;
   }
 
+  const attachmentPaths = attachments.value.map(file => file.path);
   try {
     const result = await SendEmail(
     to.value,
     cc.value,
     bcc.value,
     subject.value,
-    body.value
+    body.value,
+    attachmentPaths
     );
+    emit('close');
   } catch (err) {
     alert(`Error sending Email: ${err}`);
     console.error(err)
   }
-  const formData = new FormData();
-  formData.append('to', to.value);
-  formData.append('cc', cc.value);
-  formData.append('bcc', bcc.value);
-  formData.append('subject', subject.value);
-  formData.append('body', body.value);
-  attachments.value.forEach((file) => {
-    formData.append('attachments', file);
-  });
-  console.log('✅ Email data is ready to be sent!');
-  console.log('Here is the FormData object that would be sent to the backend:');
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
-  alert(
-    'Email data has been prepared and logged to the console. Check the developer tools (F12) to see the FormData object.'
-  );
-  emit('close');
 };
 </script>
 

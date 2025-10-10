@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"errors"
 	"strings"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
@@ -97,7 +98,7 @@ func cleanEmailList(emails string) []string {
 	return list
 }
 
-func (a *App) SendEmail(to, cc, bcc string, subject string, body string) (string, error) {
+func (a *App) SendEmail(to, cc, bcc string, subject string, body string, attachmentPaths []string) (string, error) {
 	if a.mail == nil {
 		return "",errors.New("Connect to a server first")
 	}
@@ -107,12 +108,18 @@ func (a *App) SendEmail(to, cc, bcc string, subject string, body string) (string
 	bccList := cleanEmailList(bcc)
 
 
-	err := a.mail.SendEmail(toList, ccList, bccList, subject, body)
+	err := a.mail.SendEmail(toList, ccList, bccList, subject, body, attachmentPaths)
 	if err != nil {
 		return "", err
 	}
 	return "Sent Email Successfully", nil
 	
+}
+
+func (a *App) PickFiles() ([]string, error) {
+	return runtime.OpenMultipleFilesDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "Select files to attach",
+	})
 }
 
 

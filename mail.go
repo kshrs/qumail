@@ -63,7 +63,7 @@ func (m *Mail) Disconnect() {
 	}
 }
 
-func (m *Mail) SendEmail(to, cc, bcc []string, subject string, body string) error {
+func (m *Mail) SendEmail(to, cc, bcc []string, subject string, body string, attachmentPaths []string) error {
 	msg := gomail.NewMessage()
 	
 	msg.SetHeader("From", m.MailID)
@@ -78,6 +78,13 @@ func (m *Mail) SendEmail(to, cc, bcc []string, subject string, body string) erro
 
 	// Message Body
 	msg.SetBody("text/html", body)
+
+	// Attach files to msg
+	for _, path := range attachmentPaths {
+		if path != "" {
+			msg.Attach(path)
+		}
+	}
 
 
 	// Configure Port and Host

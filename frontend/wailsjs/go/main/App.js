@@ -10,6 +10,10 @@ export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
-export function SendEmail(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['main']['App']['SendEmail'](arg1, arg2, arg3, arg4, arg5);
+export function PickFiles() {
+  return window['go']['main']['App']['PickFiles']();
+}
+
+export function SendEmail(arg1, arg2, arg3, arg4, arg5, arg6) {
+  return window['go']['main']['App']['SendEmail'](arg1, arg2, arg3, arg4, arg5, arg6);
 }
