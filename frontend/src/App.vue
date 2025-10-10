@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import HelloWorld from './components/HelloWorld.vue'
 import Header from './components/Header.vue'
+import TopBar from './components/TopBar.vue';
 </script>
 
 <template>
-  <TopBar />
-  <SideBar />
-  <MainBox />
+  <Header />
   <HelloWorld />
+  <TopBar />
 </template>
 
 <style>
