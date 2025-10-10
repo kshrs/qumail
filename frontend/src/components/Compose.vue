@@ -158,7 +158,7 @@ const confirmDiscard = () => {
 
 const confirmSend = () => {
   showSendConfirmDialog.value = false;
-  sendEmail;
+  sendEmail();
 };
 
 // Send Email with attachments
@@ -186,6 +186,6 @@ const sendEmail = async () => {
 };
 </script>
 
-<style src ="../assets/Compose.css">
+<style src ="../assets/styles/Compose.css">
 </style>
 

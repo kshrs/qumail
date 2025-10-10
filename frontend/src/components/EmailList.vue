@@ -168,4 +168,4 @@ const toggleSelect = (email) => {
 };
 </script>
 
-<style src="../assets/EmailList.css"></style>
+<style src="../assets/styles/EmailList.css"></style>

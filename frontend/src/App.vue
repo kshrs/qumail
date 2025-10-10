@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <ToolBar />
     <!-- Sidebar -->
     <hsidebar class="sidebar" :visible="sidebarOpen" @open-compose="openCompose" />
 
@@ -17,7 +18,6 @@
         </div>
       </div>
     </div>
-  <TopBar />
 
   </div>
 </template>
@@ -28,6 +28,7 @@ import Compose from './components/Compose.vue';
 import Inbox from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';
+import ToolBar from './components/ToolBar.vue';
 
 const sidebarOpen = ref(false);
 
