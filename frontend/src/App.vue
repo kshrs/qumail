@@ -1,4 +1,5 @@
 <template>
+  <TopBar />
   <div id="app">
     <Compose v-if="isComposeOpen" @close="closeCompose" />
     <Inbox v-else />
@@ -10,10 +11,12 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import Compose from './components/Compose.vue';
 import Inbox from './components/EmailList.vue';
+import TopBar from './components/TopBar.vue';
+
 
 const isComposeOpen = ref(false);
 const openCompose = () => (isComposeOpen.value = true);
