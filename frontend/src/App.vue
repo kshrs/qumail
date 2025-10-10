@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <ToolBar />
     <!-- Sidebar -->
     <hsidebar class="sidebar" :visible="sidebarOpen" @open-compose="openCompose" />
 
@@ -17,20 +18,24 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import Compose from './components/Compose.vue';
+import Inbox from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';
+import ToolBar from './components/ToolBar.vue';
 
 const sidebarOpen = ref(false);
 
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value;
 }
+
 
 const isComposeOpen = ref(false);
 

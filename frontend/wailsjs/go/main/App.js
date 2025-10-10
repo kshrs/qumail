@@ -6,14 +6,14 @@ export function FetchEmails() {
   return window['go']['main']['App']['FetchEmails']();
 }
 
-export function Greet(arg1) {
-  return window['go']['main']['App']['Greet'](arg1);
-}
-
 export function PickFiles() {
   return window['go']['main']['App']['PickFiles']();
 }
 
 export function SendEmail(arg1, arg2, arg3, arg4, arg5, arg6) {
   return window['go']['main']['App']['SendEmail'](arg1, arg2, arg3, arg4, arg5, arg6);
+}
+
+export function ToggleRead(arg1, arg2) {
+  return window['go']['main']['App']['ToggleRead'](arg1, arg2);
 }
