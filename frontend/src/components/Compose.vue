@@ -111,11 +111,6 @@ const showAlert = ref(false);
 const alertTitle = ref('');
 const alertMessage = ref('');
 
-const confirmDiscard = () => {
-  showConfirmDialog.value = false; // Hide the dialog
-  emit('close'); // Perform the original close action
-
-};
 
 // Attach files
 const addAttachments = async () => {

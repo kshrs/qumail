@@ -4,8 +4,8 @@ import {main} from '../models';
 
 export function FetchEmails():Promise<Array<main.Email>>;
 
-export function Greet(arg1:string):Promise<string>;
-
 export function PickFiles():Promise<Array<string>>;
 
 export function SendEmail(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string,arg6:Array<string>):Promise<string>;
+
+export function ToggleRead(arg1:number,arg2:boolean):Promise<string>;
