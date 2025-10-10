@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="compose-footer">
-      <button class="send-btn" @click="sendEmail">
+      <button class="send-btn" @click="handleSendClick">
         <span>Send</span>
         <i class="fa-solid fa-paper-plane"></i>
       </button>
@@ -59,8 +59,33 @@
         </div>
       </div>
     </Transition>
+    
+    <Transition name="fade">
+      <div v-if="showSendConfirmDialog" class="modal-overlay" @click.self="showSendConfirmDialog = false">
+        <div class="confirm-dialog">
+          <h3>Send Message?</h3>
+          <p>Please confirm you want to send this email to the specified recipients.</p>
+          <div class="dialog-actions">
+            <button class="btn-cancel" @click="showSendConfirmDialog = false">Cancel</button>
+            <button class="btn-confirm-send" @click="confirmSend">Send</button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+    <Transition name="fade">
+  <div v-if="showAlert" class="modal-overlay" @click.self="showAlert = false">
+    <div class="confirm-dialog">
+      <h3>{{ alertTitle }}</h3>
+      <p>{{ alertMessage }}</p>
+      <div class="dialog-actions">
+        <button class="btn-alert-ok" @click="showAlert = false">OK</button>
+      </div>
+    </div>
+  </div>
+</Transition>
   </div>
 </template>
+
 
 <script setup>
 import { ref } from 'vue';
@@ -78,13 +103,18 @@ const showBcc = ref(false);
 
 const attachments = ref([]);
 
-// CHANGE 3: New state variable to control the dialog's visibility
+
 const showConfirmDialog = ref(false);
 
+const showSendConfirmDialog = ref(false);
+const showAlert = ref(false);
+const alertTitle = ref('');
+const alertMessage = ref('');
 
 const confirmDiscard = () => {
   showConfirmDialog.value = false; // Hide the dialog
   emit('close'); // Perform the original close action
+
 };
 
 // Attach files
@@ -108,6 +138,29 @@ const addAttachments = async () => {
 // Detach Files
 const removeAttachment = (index) => {
   attachments.value.splice(index, 1);
+};
+const handleSendClick = () => {
+  if (!to.value.trim()) {
+   
+    alertTitle.value = 'Recipient Missing';
+    alertMessage.value = 'Please add at least one recipient to the "To" field before sending.';
+    showAlert.value = true;
+  } else {
+ 
+    showSendConfirmDialog.value = true;
+  }
+};
+
+
+const confirmDiscard = () => {
+
+  showConfirmDialog.value = false;
+  emit('close');
+};
+
+const confirmSend = () => {
+  showSendConfirmDialog.value = false;
+  sendEmail;
 };
 
 // Send Email with attachments
@@ -137,3 +190,4 @@ const sendEmail = async () => {
 
 <style src ="../assets/Compose.css">
 </style>
+

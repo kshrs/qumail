@@ -1,22 +1,22 @@
 <template>
   <TopBar />
   <div id="app">
-    <div v-if="isComposeOpen">
-      <Compose @close="closeCompose" />
-    </div>
-    <div v-else class="welcome-screen">
-      <button class="compose-btn" @click="openCompose">
-        <i class="fa-solid fa-pen"></i>
-        <span>Compose</span>
-      </button>
-    </div>
+    <Compose v-if="isComposeOpen" @close="closeCompose" />
+    <Inbox v-else />
+
+    <button v-if="!isComposeOpen" @click="openCompose" class="floating-compose-btn">
+      <i class="fa-solid fa-pen"></i>
+      <span>Compose</span>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import Compose from './components/Compose.vue';
+import Inbox from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
+
 
 const isComposeOpen = ref(false);
 const openCompose = () => (isComposeOpen.value = true);
@@ -28,45 +28,44 @@ body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background-color: #f6f8fa;
+  overflow: hidden; /* Prevent the page from scrolling */
 }
 
+/* These styles allow your components to fill the screen properly */
 #app {
   height: 100vh;
   width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  position: relative; /* Needed for the floating button */
 }
 
-.welcome-screen {
-  text-align: center;
-  color: #555;
-}
-
-.compose-btn {
+/* Styles for the floating compose button */
+.floating-compose-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 15px;
-  background-color: #fffdfd;
-  color: #16498c;
-  border: none;
+  background-color: #ffffff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
   border-radius: 28px;
   cursor: pointer;
   font-size: 15px;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
-  transition: all 0.3s ease-in-out;
-  padding: 15px 30px;
-  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  transition: all 0.2s ease-in-out;
+  padding: 16px 24px;
+  z-index: 999; /* This ensures the button is on top of the inbox list */
 }
 
-.compose-btn:hover {
-  background-color: #c7cace;
+.floating-compose-btn:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,.2);
+  background-color: #f8f9fa;
 }
 
-.compose-btn i {
+.floating-compose-btn i {
   font-size: 18px;
 }
 </style>
