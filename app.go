@@ -9,6 +9,8 @@ import (
 	"errors"
 	"strings"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/emersion/go-imap"
+	// "github.com/emersion/go-imap/client"
 )
 
 // App struct
@@ -46,11 +48,6 @@ func (a *App) startup(ctx context.Context) {
 
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
-}
-
 func (a *App) FetchEmails() ([]Email, error) {
 	if a.mail == nil {
 		return nil, errors.New("not connected to the mail server")
@@ -63,6 +60,16 @@ func (a *App) FetchEmails() ([]Email, error) {
 
 	var emails []Email
 	for _, msg := range messages {
+
+		isRead := false
+		for _, flag := range msg.Flags {
+			if flag == imap.SeenFlag {
+				isRead = true
+				break
+			}
+		}
+
+
 		if msg.Envelope == nil {
 			continue
 		}
@@ -74,9 +81,11 @@ func (a *App) FetchEmails() ([]Email, error) {
 		}
 
 		email := Email{
+			SeqNum: msg.SeqNum,
 			From: from,
 			Subject: msg.Envelope.Subject,
 			Date: msg.Envelope.Date.Format("02 Jan 2006 15:04"),
+			IsRead: isRead,
 		}
 		emails = append(emails, email)
 	}
@@ -120,6 +129,31 @@ func (a *App) PickFiles() ([]string, error) {
 	return runtime.OpenMultipleFilesDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: "Select files to attach",
 	})
+}
+
+func (a *App) ToggleRead(seqNum uint32, currentStateIsRead bool) (string, error) {
+	if a.mail == nil {
+		return "",errors.New("Connect to a server first")
+	}
+
+	seqset := new(imap.SeqSet)
+	seqset.AddNum(seqNum)
+
+	var op imap.FlagsOp
+	op = imap.AddFlags
+	if currentStateIsRead {
+		op = imap.RemoveFlags
+	}
+	item := imap.FormatFlagsOp(op, true)
+
+	flag := imap.SeenFlag
+
+	err := a.mail.Client.Store(seqset, item, []interface{}{flag}, nil)
+	if err != nil {
+		return "", err
+	}
+
+	return "Read Status Updated", nil
 }
 
 
