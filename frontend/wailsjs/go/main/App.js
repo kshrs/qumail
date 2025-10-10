@@ -9,3 +9,7 @@ export function FetchEmails() {
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
+
+export function SendEmail(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['main']['App']['SendEmail'](arg1, arg2, arg3, arg4, arg5);
+}

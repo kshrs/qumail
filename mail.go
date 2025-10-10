@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"errors"
+	"log"
+	"strconv"
+	"gopkg.in/gomail.v2"
 	"github.com/emersion/go-imap"
 	"github.com/emersion/go-imap/client"
-	"log"
-	"errors"
 )
 
 
@@ -62,6 +63,33 @@ func (m *Mail) Disconnect() {
 	}
 }
 
+func (m *Mail) SendEmail(to, cc, bcc []string, subject string, body string) error {
+	msg := gomail.NewMessage()
+	
+	msg.SetHeader("From", m.MailID)
+	msg.SetHeader("To", to...)
+	if len(cc) > 0 {
+		msg.SetHeader("Cc", cc...)
+	}
+	if len(bcc) > 0 {
+		msg.SetHeader("Bcc", bcc...)
+	}
+	msg.SetHeader("Subject", subject)
+
+	// Message Body
+	msg.SetBody("text/html", body)
+
+
+	// Configure Port and Host
+	port, _ := strconv.Atoi("587")
+	dialer := gomail.NewDialer("smtp.gmail.com", port, m.MailID, m.Password)
+
+	if err := dialer.DialAndSend(msg); err != nil {
+		return err
+	}
+	return nil
+}
+
 
 func (m *Mail) GetMessages(mailbox string, count uint32) ([]*imap.Message, error) {
 	if m.Client == nil {
@@ -104,25 +132,4 @@ func (m *Mail) GetMessages(mailbox string, count uint32) ([]*imap.Message, error
 
 	return messages, nil
 }
-
-func (m *Mail) PrintMessages(messages chan *imap.Message) error {
-	if messages == nil { return errors.New("*imap.Message chan empty")
-	}
-	for msg := range messages {
-		fmt.Println("================================")
-		for _, addr := range msg.Envelope.From {
-			fmt.Println("Personal Name: ", addr.PersonalName)
-			fmt.Println("MailBox Name: ", addr.MailboxName)
-			fmt.Println("Host Name: ", addr.HostName)
-			fmt.Println()
-		}
-		fmt.Println("Subject: ", msg.Envelope.Subject)
-		fmt.Println("Date: ", msg.Envelope.Date)
-		fmt.Println("================================")
-		fmt.Println()
-	}
-
-	return nil
-}
-
 

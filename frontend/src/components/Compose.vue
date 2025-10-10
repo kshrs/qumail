@@ -71,6 +71,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { SendEmail } from '../../wailsjs/go/main/App';
 
 const emit = defineEmits(['close']);
 
@@ -108,10 +109,23 @@ const confirmDiscard = () => {
   emit('close'); // Perform the original close action
 };
 
-const sendEmail = () => {
+const sendEmail = async () => {
   if (!to.value.trim()) {
     alert('Please enter at least one recipient in the "To" field.');
     return;
+  }
+
+  try {
+    const result = await SendEmail(
+    to.value,
+    cc.value,
+    bcc.value,
+    subject.value,
+    body.value
+    );
+  } catch (err) {
+    alert(`Error sending Email: ${err}`);
+    console.error(err)
   }
   const formData = new FormData();
   formData.append('to', to.value);
