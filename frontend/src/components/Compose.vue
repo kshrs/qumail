@@ -152,12 +152,6 @@ const handleSendClick = () => {
 };
 
 
-const confirmDiscard = () => {
-
-  showConfirmDialog.value = false;
-  emit('close');
-};
-
 const confirmSend = () => {
   showSendConfirmDialog.value = false;
   sendEmail();
@@ -188,4 +182,5 @@ const sendEmail = async () => {
 };
 </script>
 
-<style src="../assets/styles/Compose.css">< /style>
+<style src="../assets/styles/Compose.css">
+</style>

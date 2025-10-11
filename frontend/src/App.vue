@@ -35,7 +35,7 @@ const openCompose = () => {
 };
 const closeCompose = () => (isComposeOpen.value = false);
 
-const viewEmail = (email) => {
+const viewEmail = (email: any) => {
   isComposeOpen.value = false; // Close compose window if it's open
   selectedEmail.value = email;
 };
@@ -51,7 +51,7 @@ body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background-color: #f6f8fa;
-  overflow: hidden; /*NO scrolling */
+  /* overflow:hidden; NO scrolling */
 }
 
 #app {
