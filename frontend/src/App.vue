@@ -1,24 +1,29 @@
 <template>
-  <div id="app">
-    <Compose v-if="isComposeOpen" @close="closeCompose" />
-    
-    <EmailView v-else-if="selectedEmail" :email="selectedEmail" @close="closeEmailView" />
-    
-    
-    <Inbox v-else @view-email="viewEmail" />
-    
-
-    <button v-if="!isComposeOpen && !selectedEmail" @click="openCompose" class="floating-compose-btn">
-      <i class="fa-solid fa-pen"></i>
-      <span>Compose</span>
-    </button>
+  <div>
+    <TopBar />
+    <div id="app">
+      <Compose v-if="isComposeOpen" @close="closeCompose" />
+      
+      <EmailView v-else-if="selectedEmail" :email="selectedEmail" @close="closeEmailView" />
+      
+      
+      <Inbox v-else @view-email="viewEmail" />
+      
+  
+      <button v-if="!isComposeOpen && !selectedEmail" @click="openCompose" class="floating-compose-btn">
+        <i class="fa-solid fa-pen"></i>
+        <span>Compose</span>
+      </button>
+    </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import Compose from './components/Compose.vue';
 import Inbox from './components/EmailList.vue';
+import TopBar from './components/TopBar.vue';
+
 import EmailView from './components/EmailView.vue'; 
 
 const isComposeOpen = ref(false);
