@@ -2,6 +2,27 @@
   <div class="compose-view">
     <div class="compose-header">
       <h3>New Message</h3>
+    <div class="dropdown-container">
+    
+      <button class="security-level-btn" @click="toggleDropdown">
+        <span>{{ selectedLevel.label }}</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+    
+      <Transition name="fade">
+        <div v-if="dropdownOpen" class="dropdown-menu">
+          
+          <div 
+            v-for="level in levels" 
+            :key="level.value" 
+            class="dropdown-item" 
+            @click="selectLevel(level)"> <strong>{{ level.label }}</strong>
+            <p>{{ level.description }}</p>
+          </div>
+    
+        </div>
+      </Transition>
+    </div>
       <div class="compose-controls">
         <button class="close-btn" @click="$emit('close')" title="Close">×</button>
       </div>
@@ -90,8 +111,8 @@
 </template>
 
 
-<script setup>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { SendEmail, PickFiles } from '../../wailsjs/go/main/App';
 
 const emit = defineEmits(['close']);
@@ -104,7 +125,7 @@ const body = ref('');
 const showCc = ref(false);
 const showBcc = ref(false);
 
-const attachments = ref([]);
+const attachments = ref<{ name: string, path: string }[]>([]);
 
 
 const showConfirmDialog = ref(false);
@@ -113,6 +134,50 @@ const showSendConfirmDialog = ref(false);
 const showAlert = ref(false);
 const alertTitle = ref('');
 const alertMessage = ref('');
+
+// Security Level
+// --- Dropdown state
+const dropdownOpen = ref(false);          // whether dropdown is open or not
+const levels = [{
+  value: "OTP",
+  label: "Level 1: One Time Pad",
+  description: "Classical symmetric key encryption. Not Quantum Secure."
+  },
+  {
+  value: "QKD_AES",
+  label: "Level 2: QKD-Seeded AES",
+  description: "Uses Quantum Key Distribution to seed the AES algorithm."
+  },
+  {
+  value: "PQC",
+  label: "Level 3: Post-Quantum Cryptography",
+  description: "Uses algorithms resistant to qunatum attacks."
+  },
+  {
+  value: "NONE",
+  label: "Level 4: No Encryption",
+  description: "Data is sent in plaintext without any security."
+  }
+];
+const selectedLevel = ref(levels[3]);  // button label
+
+function toggleDropdown(e: Event) {
+  e.stopPropagation();
+  dropdownOpen.value = !dropdownOpen.value;
+};
+
+function selectLevel(level: typeof levels[0]) {
+  selectedLevel.value = level;
+  dropdownOpen.value = false;
+};
+
+// --- close dropdown on outside click
+function closeAll() { 
+dropdownOpen.value = false;
+};
+onMounted(() => window.addEventListener('click', closeAll));
+onBeforeUnmount(() => window.removeEventListener('click', closeAll));
+
 
 
 // Attach files
@@ -134,7 +199,7 @@ const addAttachments = async () => {
 };
 
 // Detach Files
-const removeAttachment = (index) => {
+const removeAttachment = (index: number) => {
   attachments.value.splice(index, 1);
 };
 const handleSendClick = () => {

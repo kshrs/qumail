@@ -12,29 +12,6 @@ function goTo(href: string) {
   window.location.href = href
 }
 
-// --- Dropdown state
-const dropdownOpen = ref(false)           // whether dropdown is open or not
-const selectedLevel = ref("Select Security Level")  // button label
-const levels = ["Level 1- Quantum Secure : use One Time Pad No Quantum security.",
-                "Level 2- Quantum-aided AES: use Quantum keys as seed for AES.",
-                "Level 3- Any other encryption (like PQC) may be given as option.",
-                "Level 4- No Quantum security."]
-
-function toggleDropdown(e: Event) {
-  e.stopPropagation()
-  dropdownOpen.value = !dropdownOpen.value
-}
-
-function selectLevel(level: string) {
-  selectedLevel.value = level
-  dropdownOpen.value = false
-}
-
-// --- close dropdown on outside click
-function closeAll() { dropdownOpen.value = false }
-onMounted(() => window.addEventListener('click', closeAll))
-onBeforeUnmount(() => window.removeEventListener('click', closeAll))
-
 // --- Delete button confirmation dialog
 const showDeleteDialog = ref(false)
 function confirmDelete() {
@@ -68,22 +45,6 @@ function deleteAction() {
         <button class="feature-btn settings-btn" @click="goTo('#')" title="Settings">Settings</button>
       </div>
 
-      <!-- Dropdown Button -->
-      <div class="dropdown-container">
-        <button class="readable-select" @click.stop="toggleDropdown">{{ selectedLevel }}</button>
-
-        <!-- Dropdown List -->
-        <div class="select-dropdown" v-if="dropdownOpen">
-          <div
-            v-for="level in levels"
-            :key="level"
-            class="select-item"
-            @click="selectLevel(level)"
-          >
-            {{ level }}
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Delete Confirmation Dialog -->
