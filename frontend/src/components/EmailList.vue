@@ -1,64 +1,9 @@
 <template>
-
   <div class="inbox-container">
-
     <div class="inbox-toolbar">
-      <div class="toolbar-left">
-
-        <input
-          type="checkbox"
-          v-model="selectAll"
-          class="email-checkbox"
-          title="Select all"
-        />
-
-
-        <button
-          @click="refreshEmails"
-          class="options-btn"
-          title="Refresh"
-        >
-          <i class="fa-solid fa-rotate-right"></i>
-        </button>
-
-
-        <div class="more-options-container">
-          <button
-            @click="isMoreMenuOpen = !isMoreMenuOpen"
-            class="options-btn"
-            title="More"
-          >
-            <i class="fa-solid fa-ellipsis-vertical"></i>
-          </button>
-
-          <Transition name="fade">
-            <div v-if="isMoreMenuOpen" class="more-menu">
-              <div @click="markAllAsRead" class="menu-item">
-                Mark all as read
-              </div>
-            </div>
-          </Transition>
-        </div>
       </div>
 
-      <div class="toolbar-right">
-        <span>1-50 of {{ emails.length }}</span>
-        <button class="options-btn" title="Newer">
-          <i class="fa-solid fa-chevron-left"></i>
-        </button>
-        <button class="options-btn" title="Older">
-          <i class="fa-solid fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <div class="email-list" :class="{ loading: isLoading }">
-
-      <div v-if="isLoading" class="loader">
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        <span>Loading</span>
-      </div>
-
+    <div class="email-list">
       <div
         v-for="email in emails"
         :key="email.id"
@@ -67,105 +12,135 @@
           'is-read': email.isRead,
           'is-selected': email.isSelected,
         }"
+        @click="handleRowClick(email)"
       >
-        
         <div class="email-actions">
           <input
             type="checkbox"
             :checked="email.isSelected"
-            @change="toggleSelect(email)"
+            @click.stop="toggleSelect(email)"
             class="email-checkbox"
           />
-          <button
-            @click.stop="toggleStar(email)"
-            class="star-btn"
-            :title="email.isStarred ? 'Starred' : 'Not starred'"
-          >
-            <i
-              :class="email.isStarred ? 'fa-solid fa-star' : 'fa-regular fa-star'"
-            ></i>
+          <button @click.stop="toggleStar(email)" class="star-btn">
+            <i :class="email.isStarred ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
           </button>
         </div>
-
-       
+        
         <div class="email-sender">
           <span>{{ email.sender }}</span>
         </div>
-
-      
+        
         <div class="email-content">
           <span class="email-subject">{{ email.subject }}</span>
-          <span class="email-snippet">&nbsp;&ndash;&nbsp;{{ email.snippet }}</span>
+          <span class="email-snippet">&nbsp;-&nbsp;{{ email.snippet }}</span>
         </div>
 
-       
         <div class="email-date">
-          <span>{{ email.timestamp }}</span>
-        </div>
+          {{ email.timestamp.split(',')[0] }} </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
+
+const emit = defineEmits(['view-email']);
 
 
+// This ref now contains the email objects, which will make them appear on the screen.
 const emails = ref([
-  { id: 1, sender: 'Medium Daily Digest', subject: "Elon Musk Doesn't Understand AI", snippet: 'I Will Lockett | G Ashwin Balaji Stories', timestamp: '07:00', isRead: false, isStarred: false, isSelected: false },
-  { id: 2, sender: 'LinkedIn', subject: 'Ashwin, thanks for being a valued member', snippet: 'This is the preview text visible in notifications', timestamp: '03:40', isRead: false, isStarred: true, isSelected: false },
-  { id: 3, sender: 'Gamma', subject: 'Pay with UPI now available', snippet: "We're excited to share that Unified Payments Interface (UPI) is now a payment option", timestamp: '01:35', isRead: false, isStarred: false, isSelected: false },
-  { id: 4, sender: 'Coursera', subject: 'Jumpstart your JavaScript journey with Microsoft', snippet: 'Master front-end development fundamentals by building web applications', timestamp: '9 Oct', isRead: true, isStarred: false, isSelected: false },
-  { id: 5, sender: 'Google', subject: 'Security alert for gashwinbalaji10@gmail.com', snippet: 'This is a copy of a security alert sent to gashwinbalaji10@gmail.com', timestamp: '9 Oct', isRead: true, isStarred: false, isSelected: false },
-  { id: 6, sender: 'Kishor 2', subject: 'Re: [kshrs/qumail] Added compose part', snippet: 'Compose.vue, Compose.css) (PR #1) · Merged #1 into main. – Reply to this email directly', timestamp: '9 Oct', isRead: true, isStarred: false, isSelected: false },
-  { id: 7, sender: 'Adobe for Photographers', subject: 'Learn the trick behind main character magic', snippet: 'Deculter your masterpiece with Generative Remove and Quick Actions', timestamp: '9 Oct', isRead: true, isStarred: true, isSelected: false },
-  { id: 8, sender: 'Tata Consultancy Services', subject: 'Tata Consultancy Services is hiring', snippet: 'See new openings', timestamp: '8 Oct', isRead: true, isStarred: false, isSelected: false },
+  {
+    id: 1,
+    sender: 'GitHub',
+    senderEmail: 'noreply@github.com',
+    subject: 'New vulnerability found in your repository',
+    snippet: 'A high-severity vulnerability has been detected in the `express` dependency...',
+    body: `<p>Hi DevTeam,</p><p>We've detected a high-severity vulnerability in the <strong>express</strong> dependency in your 'Project-Phoenix' repository.</p><p>We recommend updating to the latest patched version as soon as possible. Please review the security advisory for more details.</p><p>Thanks,<br>The GitHub Security Team</p>`,
+    timestamp: 'Oct 10, 2025, 06:45 PM',
+    isRead: false,
+    isStarred: true,
+    isSelected: false,
+    to: 'you@example.com',
+    cc: 'security@example.com',
+    attachments: [{ name: 'vulnerability-report.pdf', size: '256 KB' }],
+  },
+  {
+    id: 2,
+    sender: 'Alice Johnson',
+    senderEmail: 'alice.j@workplace.com',
+    subject: 'Project Kick-off Meeting',
+    snippet: 'Hi team, please find the agenda for our kick-off meeting tomorrow morning.',
+    body: `<p>Hi Team,</p><p>Looking forward to our meeting tomorrow at 9:00 AM. I've attached the agenda for the Project Nova kick-off.</p><p>Please come prepared with any initial questions.</p><p>Best,<br>Alice</p>`,
+    timestamp: 'Oct 10, 2025, 04:10 PM',
+    isRead: false,
+    isStarred: false,
+    isSelected: false,
+    to: 'you@example.com',
+    cc: 'manager@example.com',
+    attachments: [{ name: 'Project-Nova-Agenda.docx', size: '78 KB' }],
+  },
+  {
+    id: 3,
+    sender: 'Linear',
+    senderEmail: 'notifications@linear.app',
+    subject: 'PRJ-124: New comment on "Deploy frontend to production"',
+    snippet: 'Bob commented: "Looks good to me! Ready for deployment."',
+    body: `<p><strong>Bob Williams</strong> left a comment on issue <a href="#">PRJ-124</a>:</p><blockquote>"Looks good to me! Ready for deployment. Let's sync up before pushing the button."</blockquote>`,
+    timestamp: 'Oct 10, 2025, 02:30 PM',
+    isRead: true,
+    isStarred: false,
+    isSelected: false,
+    to: 'you@example.com',
+    cc: null,
+    attachments: [],
+  },
+  {
+    id: 4,
+    sender: 'Figma',
+    senderEmail: 'team@figma.com',
+    subject: 'Weekly Design Updates & Inspiration',
+    snippet: 'Check out the latest features, plugins, and stunning designs from the community.',
+    body: `<p>Hi there,</p><p>Here's your weekly dose of inspiration from the Figma community. We've also rolled out some new features for auto-layout that you might find interesting!</p><p>Happy designing!</p>`,
+    timestamp: 'Oct 09, 2025, 11:00 AM',
+    isRead: true,
+    isStarred: false,
+    isSelected: false,
+    to: 'you@example.com',
+    cc: null,
+    attachments: [],
+  },
+  {
+    id: 5,
+    sender: 'Charlie Davis',
+    senderEmail: 'charlie.d@workplace.com',
+    subject: 'Quick question about the API docs',
+    snippet: "Hey, are the docs for the new payment gateway endpoint updated yet?",
+    body: `<p>Hey,</p><p>Just checking in to see if the documentation for the new payment gateway endpoint is live. Can't seem to find it on Confluence.</p><p>Let me know!</p><p>Thanks,<br>Charlie</p>`,
+    timestamp: 'Oct 08, 2025, 05:22 PM',
+    isRead: true,
+    isStarred: true,
+    isSelected: false,
+    to: 'you@example.com',
+    cc: null,
+    attachments: [],
+  }
 ]);
 
-const isLoading = ref(false);
-const isMoreMenuOpen = ref(false);
 
-const selectAll = computed({
-  get: () => emails.value.length > 0 && emails.value.every(e => e.isSelected),
-  set: (value) => emails.value.forEach(e => (e.isSelected = value)),
-});
-
-
-const refreshEmails = () => {
-  isLoading.value = true;
-  isMoreMenuOpen.value = false;
-
-  setTimeout(() => {
-    const firstUnread = emails.value.find(e => e.isRead);
-    if (firstUnread) firstUnread.isRead = false;
-
-    emails.value.unshift({
-      id: Date.now(),
-      sender: 'Kishor S',
-      subject: 'Jolly Work!',
-      snippet: 'I had completed my work!',
-      timestamp: 'Now',
-      isRead: false,
-      isStarred: false,
-      isSelected: false,
-    });
-
-    isLoading.value = false;
-  }, 1500);
+const handleRowClick = (email) => {
+  email.isRead = true; // Mark the email as read
+  emit('view-email', email); // Send the email data to the parent component
 };
 
-const markAllAsRead = () => {
-  emails.value.forEach(e => (e.isRead = true));
-  isMoreMenuOpen.value = false;
+// These functions handle the checkbox and star actions without navigating away
+const toggleSelect = (email) => {
+  email.isSelected = !email.isSelected;
 };
 
 const toggleStar = (email) => {
   email.isStarred = !email.isStarred;
 };
-
-const toggleSelect = (email) => {
-  email.isSelected = !email.isSelected;
-};
 </script>
 
-<style src="../assets/EmailList.css"></style>
+<style src="../assets/styles/EmailList.css"></style>

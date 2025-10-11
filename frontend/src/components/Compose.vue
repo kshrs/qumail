@@ -151,7 +151,7 @@ const confirmDiscard = () => {
 
 const confirmSend = () => {
   showSendConfirmDialog.value = false;
-  sendEmail;
+  sendEmail();
 };
 const sendEmail = () => {
 
@@ -173,4 +173,4 @@ const sendEmail = () => {
 };
 </script>
 
-<style src="../assets/Compose.css"></style>
+<style src="../assets/styles/Compose.css"></style>
