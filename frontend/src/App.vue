@@ -30,24 +30,37 @@ import Inbox from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';
 import ToolBar from './components/ToolBar.vue';
+import EmailView from './components/EmailView.vue'; 
+
 
 const sidebarOpen = ref(false);
+const isComposeOpen = ref(false);
 
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value;
 }
 
 
-const isComposeOpen = ref(false);
+const selectedEmail = ref(null);
 
 const openCompose = () => {
+  selectedEmail.value = null; // Clear emailview for compose
   isComposeOpen.value = true;
   sidebarOpen.value = true;
 };
-
 const closeCompose = () => {
   isComposeOpen.value = false;
 };
+
+const viewEmail = (email) => {
+  isComposeOpen.value = false; // Close compose window if it's open
+  selectedEmail.value = email;
+};
+
+const closeEmailView = () => {
+  selectedEmail.value = null;
+};
+
 
 // Close sidebar on ESC key
 const onKey = (e) => {
@@ -173,7 +186,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  gap: 15px;
+  background-color: #ffffff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 28px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  transition: all 0.2s ease-in-out;
+  padding: 16px 24px;
+  z-index: 999;
 }
 
 #logo {
