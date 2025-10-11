@@ -125,7 +125,7 @@ func (m *Mail) GetMessages(mailbox string, count uint32) ([]*imap.Message, error
 	done := make(chan error, 1)
 
 	go func() {
-		done <- m.Client.Fetch(seqset, []imap.FetchItem{imap.FetchEnvelope}, messagesChan)
+		done <- m.Client.Fetch(seqset, []imap.FetchItem{imap.FetchEnvelope, imap.FetchFlags}, messagesChan)
 	}()
 
 	if err := <- done; err != nil {

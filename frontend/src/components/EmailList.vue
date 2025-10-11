@@ -1,146 +1,321 @@
 <template>
+
   <div class="inbox-container">
+
     <div class="inbox-toolbar">
+      <div class="toolbar-left">
+
+        <input
+          type="checkbox"
+          v-model="selectAll"
+          class="email-checkbox"
+          title="Select all"
+        />
+
+
+        <button
+          @click="refreshEmails"
+          class="options-btn"
+          title="Refresh"
+        >
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+
+
+        <div class="more-options-container">
+          <button
+            @click="isMoreMenuOpen = !isMoreMenuOpen"
+            class="options-btn"
+            title="More"
+          >
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </button>
+
+          <Transition name="fade">
+            <div v-if="isMoreMenuOpen" class="more-menu">
+              <div @click="markAllAsRead" class="menu-item">
+                Mark all as read
+              </div>
+            </div>
+          </Transition>
+        </div>
       </div>
 
-    <div class="email-list">
+      <div class="toolbar-right">
+        <span>1-50 of {{ emails.length }}</span>
+        <button class="options-btn" title="Newer">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button class="options-btn" title="Older">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="email-list" :class="{ loading: isLoading }">
+
+      <div v-if="isLoading" class="loader">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>Loading</span>
+      </div>
+
       <div
         v-for="email in emails"
-        :key="email.id"
+        :key="email.seqNum"
         class="email-row"
         :class="{
           'is-read': email.isRead,
           'is-selected': email.isSelected,
         }"
-        @click="handleRowClick(email)"
       >
+        
         <div class="email-actions">
           <input
             type="checkbox"
             :checked="email.isSelected"
-            @click.stop="toggleSelect(email)"
+            @change="toggleSelect(email)"
             class="email-checkbox"
           />
-          <button @click.stop="toggleStar(email)" class="star-btn">
-            <i :class="email.isStarred ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+          <button
+            @click.stop="toggleStar(email)"
+            class="star-btn"
+            :title="email.isStarred ? 'Starred' : 'Not starred'"
+          >
+            <i
+              :class="email.isStarred ? 'fa-solid fa-star' : 'fa-regular fa-star'"
+            ></i>
           </button>
         </div>
-        
+
+       
         <div class="email-sender">
-          <span>{{ email.sender }}</span>
-        </div>
-        
-        <div class="email-content">
-          <span class="email-subject">{{ email.subject }}</span>
-          <span class="email-snippet">&nbsp;-&nbsp;{{ email.snippet }}</span>
+          <span>{{ email.from }}</span>
         </div>
 
+      
+        <div class="email-content">
+          <span class="email-subject">{{ email.subject }}</span>
+        </div>
+
+       
         <div class="email-date">
-          {{ email.timestamp.split(',')[0] }} </div>
+          <span>{{ email.date }}</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { FetchEmails, ToggleRead, ToggleStarred } from '../../wailsjs/go/main/App';
 
-const emit = defineEmits(['view-email']);
+const emails = ref([]);
+const isLoading = ref(false);
+const isMoreMenuOpen = ref(false);
 
+const selectAll = computed({
+  get: () => emails.value.length > 0 && emails.value.every(e => e.isSelected),
+  set: (value) => emails.value.forEach(e => (e.isSelected = value)),
+});
 
-// This ref now contains the email objects, which will make them appear on the screen.
-const emails = ref([
-  {
-    id: 1,
-    sender: 'GitHub',
-    senderEmail: 'noreply@github.com',
-    subject: 'New vulnerability found in your repository',
-    snippet: 'A high-severity vulnerability has been detected in the `express` dependency...',
-    body: `<p>Hi DevTeam,</p><p>We've detected a high-severity vulnerability in the <strong>express</strong> dependency in your 'Project-Phoenix' repository.</p><p>We recommend updating to the latest patched version as soon as possible. Please review the security advisory for more details.</p><p>Thanks,<br>The GitHub Security Team</p>`,
-    timestamp: 'Oct 10, 2025, 06:45 PM',
-    isRead: false,
-    isStarred: true,
-    isSelected: false,
-    to: 'you@example.com',
-    cc: 'security@example.com',
-    attachments: [{ name: 'vulnerability-report.pdf', size: '256 KB' }],
-  },
-  {
-    id: 2,
-    sender: 'Alice Johnson',
-    senderEmail: 'alice.j@workplace.com',
-    subject: 'Project Kick-off Meeting',
-    snippet: 'Hi team, please find the agenda for our kick-off meeting tomorrow morning.',
-    body: `<p>Hi Team,</p><p>Looking forward to our meeting tomorrow at 9:00 AM. I've attached the agenda for the Project Nova kick-off.</p><p>Please come prepared with any initial questions.</p><p>Best,<br>Alice</p>`,
-    timestamp: 'Oct 10, 2025, 04:10 PM',
-    isRead: false,
-    isStarred: false,
-    isSelected: false,
-    to: 'you@example.com',
-    cc: 'manager@example.com',
-    attachments: [{ name: 'Project-Nova-Agenda.docx', size: '78 KB' }],
-  },
-  {
-    id: 3,
-    sender: 'Linear',
-    senderEmail: 'notifications@linear.app',
-    subject: 'PRJ-124: New comment on "Deploy frontend to production"',
-    snippet: 'Bob commented: "Looks good to me! Ready for deployment."',
-    body: `<p><strong>Bob Williams</strong> left a comment on issue <a href="#">PRJ-124</a>:</p><blockquote>"Looks good to me! Ready for deployment. Let's sync up before pushing the button."</blockquote>`,
-    timestamp: 'Oct 10, 2025, 02:30 PM',
-    isRead: true,
-    isStarred: false,
-    isSelected: false,
-    to: 'you@example.com',
-    cc: null,
-    attachments: [],
-  },
-  {
-    id: 4,
-    sender: 'Figma',
-    senderEmail: 'team@figma.com',
-    subject: 'Weekly Design Updates & Inspiration',
-    snippet: 'Check out the latest features, plugins, and stunning designs from the community.',
-    body: `<p>Hi there,</p><p>Here's your weekly dose of inspiration from the Figma community. We've also rolled out some new features for auto-layout that you might find interesting!</p><p>Happy designing!</p>`,
-    timestamp: 'Oct 09, 2025, 11:00 AM',
-    isRead: true,
-    isStarred: false,
-    isSelected: false,
-    to: 'you@example.com',
-    cc: null,
-    attachments: [],
-  },
-  {
-    id: 5,
-    sender: 'Charlie Davis',
-    senderEmail: 'charlie.d@workplace.com',
-    subject: 'Quick question about the API docs',
-    snippet: "Hey, are the docs for the new payment gateway endpoint updated yet?",
-    body: `<p>Hey,</p><p>Just checking in to see if the documentation for the new payment gateway endpoint is live. Can't seem to find it on Confluence.</p><p>Let me know!</p><p>Thanks,<br>Charlie</p>`,
-    timestamp: 'Oct 08, 2025, 05:22 PM',
-    isRead: true,
-    isStarred: true,
-    isSelected: false,
-    to: 'you@example.com',
-    cc: null,
-    attachments: [],
+const loadEmails = async () => {
+  isLoading.value = true;
+  isMoreMenuOpen.value = false;
+  try {
+    const fetchedEmails = await FetchEmails(10);
+    emails.value = fetchedEmails.map(email => ({
+        ...email,
+        isSelected: false,
+
+    })).reverse();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    isLoading.value = false;
   }
-]);
+}
 
-
-const handleRowClick = (email) => {
-  email.isRead = true; // Mark the email as read
-  emit('view-email', email); // Send the email data to the parent component
+const refreshEmails = async () => {
+    await loadEmails();
 };
 
-// These functions handle the checkbox and star actions without navigating away
+// Working on it
+const toggleRead = async (email) => {
+    await ToggleRead(email.seqNum, email.isStarred);
+}
+
+// Need to be worked on 
+const markAllAsRead = () => {
+  emails.value.forEach(e => (e.isRead = true));
+  isMoreMenuOpen.value = false;
+};
+
+// Need to be worked on
+const toggleStar = async (email) => {
+  email.isStarred = !email.isStarred;
+  await ToggleStarred(email.seqNum, !email.isStarred);
+};
+
 const toggleSelect = (email) => {
   email.isSelected = !email.isSelected;
 };
 
-const toggleStar = (email) => {
-  email.isStarred = !email.isStarred;
-};
+onMounted(() => {
+    loadEmails();
+});
 </script>
 
-<style src="../assets/styles/EmailList.css"></style>
+<style scoped>
+
+.inbox-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+
+.inbox-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #f8f9fb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.more-menu {
+  color: black;
+  border-radius: 25px;
+}
+
+.more-menu:hover {
+  background-color: #f6f6f6;
+  color: black;
+  border-radius: 25px;
+  transition: background 0.28s;
+
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: black;
+}
+
+.options-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px;
+}
+
+.email-checkbox {
+  cursor: pointer;
+}
+
+.email-list {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.email-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  opacity: 1;
+}
+
+.email-row:hover {
+  background-color: #f7f9fc;
+}
+
+.email-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 60px;
+}
+
+.email-sender {
+  font-weight: 600;
+  color: #333;
+  width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.email-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.email-subject {
+  font-weight: 500;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.email-date {
+  width: 100px;
+  text-align: right;
+  color: black;
+}
+
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+}
+
+.star-btn:hover {
+  color: #f5c518;
+}
+
+.fa-solid.fa-star {
+  color: #f5c518;
+}
+
+
+.email-row.is-selected {
+  background-color: #e8f0fe;
+}
+
+
+.email-row.is-read {
+  opacity: 0.7;
+}
+
+
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #666;
+  font-weight: 500;
+}
+
+.loader i {
+  margin-right: 10px;
+}
+
+</style>
