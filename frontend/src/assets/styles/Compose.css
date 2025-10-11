@@ -376,3 +376,8 @@
 .btn-alert-ok:hover {
   background-color: #2980b9;
 }
+.compose-container{
+  display: flex;
+  align-items: center;
+  height: 100px;
+}

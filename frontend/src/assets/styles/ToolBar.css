@@ -1,6 +1,7 @@
 /* Top Bar Container */
 .top-bar-container {
-  padding: 100px;
+  padding-left:300px;
+  display :flex;
 }
 
 /* Top Bar Styles */
@@ -9,7 +10,7 @@
   align-items: center;
   gap: 20px; /* Ensure even spacing between buttons */
   padding: 10px 12px;
-  background: linear-gradient(180deg, #fbfcfd 0%, #f2f6f9 100%);
+  background: #fafafa;
   border: 1px solid rgba(200, 200, 200, 0.6);
   border-radius: 8px;
 }

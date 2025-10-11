@@ -5,6 +5,7 @@
       <button class="top-btn">Home</button>
       <button class="top-btn">View</button>
       <button class="top-btn">Help</button>
+      <button class="top-btn">Plugins</button>
     </div>
   </div>
 </template>
@@ -19,13 +20,16 @@
   top: 0;
   left: 0;
   width: 100%;
+  height: 7vh;
   z-index: 500;
   display: flex;
   align-items: center;
   background: #007bff;
   padding: 12px 24px;
+  padding-top:10px;
   color: white;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  border-radius: 0;
 }
 .hamburger {
   background: transparent;

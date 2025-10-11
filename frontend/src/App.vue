@@ -1,13 +1,12 @@
 <template>
   <div class="app-container">
-    <ToolBar />
+    <TopBar v-if="loggedIn" class="topbar" @toggle-sidebar="toggleSidebar" />
+    <ToolBar v-if="loggedIn" />
     <!-- Sidebar -->
-    <hsidebar class="sidebar" :visible="sidebarOpen" @open-compose="openCompose" />
-
-
+    <hsidebar v-if="loggedIn" class="sidebar" :visible="sidebarOpen" @open-compose="openCompose" />
+    <Login_Page v-if="!loggedIn" @login="handleLogin" />
     <!-- Main content -->
-    <div :class="['main-content', { 'with-sidebar': sidebarOpen }]">
-      <TopBar class="topbar" @toggle-sidebar="toggleSidebar" />
+    <div v-if="loggedIn" :class="['main-content', { 'with-sidebar': sidebarOpen }]">
 
       <div id="app">
         <div v-if="isComposeOpen" class="compose-container">
@@ -15,6 +14,8 @@
         </div>
 
         <div v-if="!isComposeOpen" class="welcome-screen">
+          <!-- show inbox at top -->
+          <Inbox />
         </div>
       </div>
     </div>
@@ -29,8 +30,10 @@ import Inbox from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';
 import ToolBar from './components/ToolBar.vue';
+import Login_Page from './components/Login_Page.vue';
 
 const sidebarOpen = ref(false);
+const loggedIn = ref(false); // show login page first
 
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value;
@@ -43,6 +46,17 @@ const openCompose = () => {
   isComposeOpen.value = true;
   sidebarOpen.value = true;
 };
+
+// handle login event from Login_Page
+function handleLogin(payload) {
+  const { email, password } = payload || {};
+  // dummy check; replace with server-side DB check in production
+  if (email === 'kabb@projectbase.com' && String(password) === '1234') {
+    loggedIn.value = true;
+  } else {
+    alert('Invalid credentials. Use kabb@projectbase.com / 1234');
+  }
+}
 
 const closeCompose = () => {
   isComposeOpen.value = false;
@@ -73,6 +87,7 @@ onUnmounted(() => {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  user-select: none;
 }
 
 body {
@@ -83,6 +98,7 @@ body {
 
 /* App layout */
 .app-container {
+  margin-top:50px;
   height: 100vh;
   width: 100%;
   position: relative;
@@ -95,7 +111,7 @@ body {
   left: 0;
   width: 100%;
   height: 56px;
-  z-index: 1001;
+  z-index: 100;
 }
 
 .sidebar {
