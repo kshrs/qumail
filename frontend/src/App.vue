@@ -1,22 +1,27 @@
 <template>
   <div class="app-container">
     <ToolBar />
-    <Inbox />
     <!-- Sidebar -->
-    <hsidebar class="sidebar" :visible="sidebarOpen" @open-compose="openCompose" />
+    <hsidebar 
+        class="sidebar" 
+        :visible="sidebarOpen" 
+        @open-compose="showComposeView" 
+        @open-inbox="showInboxView"
 
+    />
 
     <!-- Main content -->
     <div :class="['main-content', { 'with-sidebar': sidebarOpen }]">
       <TopBar class="topbar" @toggle-sidebar="toggleSidebar" />
 
       <div id="app">
-        <div v-if="isComposeOpen" class="compose-container">
-          <Compose @close="closeCompose" />
-        </div>
-
-        <div v-if="!isComposeOpen" class="welcome-screen">
-        </div>
+          <Compose
+            v-if="currentView === 'compose'"
+            @close="showInboxView"
+          />
+          <Inbox
+            v-if="currentView === 'inbox'"
+          />
       </div>
     </div>
 
@@ -31,31 +36,37 @@ import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';
 import ToolBar from './components/ToolBar.vue';
 
-const sidebarOpen = ref(false);
+const sidebarOpen = ref(true);
+
 
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value;
 }
 
+const currentView = ref('inbox');
 
-const isComposeOpen = ref(false);
-
-const openCompose = () => {
-  isComposeOpen.value = true;
-  sidebarOpen.value = true;
+const showComposeView = () => {
+    currentView.value = 'compose';
+    sidebarOpen.value = true;
 };
 
-const closeCompose = () => {
-  isComposeOpen.value = false;
+const showInboxView = () => {
+    currentView.value = 'inbox';
 };
+
+//const openCompose = () => {
+//  isComposeOpen.value = true;
+//  sidebarOpen.value = true;
+//};
+//
+//const closeCompose = () => {
+//  isComposeOpen.value = false;
+//};
 
 // Close sidebar on ESC key
 const onKey = (e) => {
   if (e.key === 'Escape') {
     sidebarOpen.value = false;
-    if (isComposeOpen.value) {
-      closeCompose();
-    }
   }
 };
 
@@ -113,6 +124,7 @@ body {
 .main-content {
   width: 100%;
   height: calc(100vh - 56px);
+  padding: 5px 15px;
   transition: margin-left 0.28s ease, width 0.28s ease;
   margin-top: 56px;
   display: flex;

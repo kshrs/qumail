@@ -1,4 +1,5 @@
 <template>
+  <div class="main-emaillist">
 
   <div class="inbox-container">
 
@@ -103,6 +104,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 

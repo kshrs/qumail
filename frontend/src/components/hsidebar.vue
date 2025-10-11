@@ -7,16 +7,16 @@
           <span>Compose</span>
         </button>
       </div>
-      <HMenuList />
+      <HMenuList @open-inbox="$emit('open-inbox')" />
     </div>
   </transition>
-
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import HMenuList from './HMenuList.vue';
-const props = defineProps({ visible: Boolean });
+defineProps({ visible: Boolean });
+defineEmits(['open-compose', 'open-inbox']);
+
 </script>
 
 <style scoped>
@@ -44,13 +44,15 @@ const props = defineProps({ visible: Boolean });
   display: inline-flex;
   gap: 10px;
   align-items: center;
-  background: #fffdfd;
-  color: #16498c;
-  border: none;
-  border-radius: 20px;
+  background: #3174f1;
+  color: #ffffff;
   padding: 8px 14px;
   cursor: pointer;
+  font-size: 16px;
   font-weight: 600;
+
+  border-radius: 25px;
+  border: 3px solid #3174f1;
 }
 .sidebar-compose i { font-size: 14px; }
 /* When sidebar is present it covers left area; slide transition in App.vue will animate transform */

@@ -1,4 +1,7 @@
 
+.main-emaillist {
+    border-radius: 40px;
+}
 .inbox-container {
   display: flex;
   flex-direction: column;
