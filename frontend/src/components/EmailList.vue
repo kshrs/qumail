@@ -61,7 +61,7 @@
 
       <div
         v-for="email in emails"
-        :key="email.id"
+        :key="email.seqNum"
         class="email-row"
         :class="{
           'is-read': email.isRead,
@@ -89,18 +89,17 @@
 
        
         <div class="email-sender">
-          <span>{{ email.sender }}</span>
+          <span>{{ email.from }}</span>
         </div>
 
       
         <div class="email-content">
           <span class="email-subject">{{ email.subject }}</span>
-          <span class="email-snippet">&nbsp;&ndash;&nbsp;{{ email.snippet }}</span>
         </div>
 
        
         <div class="email-date">
-          <span>{{ email.timestamp }}</span>
+          <span>{{ email.date }}</span>
         </div>
       </div>
     </div>
@@ -108,20 +107,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { FetchEmails, ToggleRead, ToggleStarred } from '../../wailsjs/go/main/App';
 
-
-const emails = ref([
-  { id: 1, sender: 'Medium Daily Digest', subject: "Elon Musk Doesn't Understand AI", snippet: 'I Will Lockett | G Ashwin Balaji Stories', timestamp: '07:00', isRead: false, isStarred: false, isSelected: false },
-  { id: 2, sender: 'LinkedIn', subject: 'Ashwin, thanks for being a valued member', snippet: 'This is the preview text visible in notifications', timestamp: '03:40', isRead: false, isStarred: true, isSelected: false },
-  { id: 3, sender: 'Gamma', subject: 'Pay with UPI now available', snippet: "We're excited to share that Unified Payments Interface (UPI) is now a payment option", timestamp: '01:35', isRead: false, isStarred: false, isSelected: false },
-  { id: 4, sender: 'Coursera', subject: 'Jumpstart your JavaScript journey with Microsoft', snippet: 'Master front-end development fundamentals by building web applications', timestamp: '9 Oct', isRead: true, isStarred: false, isSelected: false },
-  { id: 5, sender: 'Google', subject: 'Security alert for gashwinbalaji10@gmail.com', snippet: 'This is a copy of a security alert sent to gashwinbalaji10@gmail.com', timestamp: '9 Oct', isRead: true, isStarred: false, isSelected: false },
-  { id: 6, sender: 'Kishor 2', subject: 'Re: [kshrs/qumail] Added compose part', snippet: 'Compose.vue, Compose.css) (PR #1) · Merged #1 into main. – Reply to this email directly', timestamp: '9 Oct', isRead: true, isStarred: false, isSelected: false },
-  { id: 7, sender: 'Adobe for Photographers', subject: 'Learn the trick behind main character magic', snippet: 'Deculter your masterpiece with Generative Remove and Quick Actions', timestamp: '9 Oct', isRead: true, isStarred: true, isSelected: false },
-  { id: 8, sender: 'Tata Consultancy Services', subject: 'Tata Consultancy Services is hiring', snippet: 'See new openings', timestamp: '8 Oct', isRead: true, isStarred: false, isSelected: false },
-]);
-
+const emails = ref([]);
 const isLoading = ref(false);
 const isMoreMenuOpen = ref(false);
 
@@ -130,42 +119,51 @@ const selectAll = computed({
   set: (value) => emails.value.forEach(e => (e.isSelected = value)),
 });
 
-
-const refreshEmails = () => {
+const loadEmails = async () => {
   isLoading.value = true;
   isMoreMenuOpen.value = false;
+  try {
+    const fetchedEmails = await FetchEmails(10);
+    emails.value = fetchedEmails.map(email => ({
+        ...email,
+        isSelected: false,
 
-  setTimeout(() => {
-    const firstUnread = emails.value.find(e => e.isRead);
-    if (firstUnread) firstUnread.isRead = false;
-
-    emails.value.unshift({
-      id: Date.now(),
-      sender: 'Kishor S',
-      subject: 'Jolly Work!',
-      snippet: 'I had completed my work!',
-      timestamp: 'Now',
-      isRead: false,
-      isStarred: false,
-      isSelected: false,
-    });
-
+    })).reverse();
+  } catch (err) {
+    console.error(err);
+  } finally {
     isLoading.value = false;
-  }, 1500);
+  }
+}
+
+const refreshEmails = async () => {
+    await loadEmails();
 };
 
+// Working on it
+const toggleRead = async (email) => {
+    await ToggleRead(email.seqNum, email.isStarred);
+}
+
+// Need to be worked on 
 const markAllAsRead = () => {
   emails.value.forEach(e => (e.isRead = true));
   isMoreMenuOpen.value = false;
 };
 
-const toggleStar = (email) => {
+// Need to be worked on
+const toggleStar = async (email) => {
   email.isStarred = !email.isStarred;
+  await ToggleStarred(email.seqNum, !email.isStarred);
 };
 
 const toggleSelect = (email) => {
   email.isSelected = !email.isSelected;
 };
+
+onMounted(() => {
+    loadEmails();
+});
 </script>
 
 <style src="../assets/styles/EmailList.css"></style>

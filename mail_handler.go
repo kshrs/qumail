@@ -6,4 +6,5 @@ type Email struct {
 	Subject string `json:"subject"`
 	Date string `json:"date"`
 	IsRead bool `json:"isRead"`
+	IsStarred bool `json:"isStarred"`
 }

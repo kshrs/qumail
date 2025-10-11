@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <ToolBar />
+    <Inbox />
     <!-- Sidebar -->
     <hsidebar class="sidebar" :visible="sidebarOpen" @open-compose="openCompose" />
 

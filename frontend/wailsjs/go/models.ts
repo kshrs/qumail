@@ -6,6 +6,7 @@ export namespace main {
 	    subject: string;
 	    date: string;
 	    isRead: boolean;
+	    isStarred: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Email(source);
@@ -18,6 +19,7 @@ export namespace main {
 	        this.subject = source["subject"];
 	        this.date = source["date"];
 	        this.isRead = source["isRead"];
+	        this.isStarred = source["isStarred"];
 	    }
 	}
 

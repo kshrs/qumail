@@ -48,11 +48,11 @@ func (a *App) startup(ctx context.Context) {
 
 }
 
-func (a *App) FetchEmails() ([]Email, error) {
+func (a *App) FetchEmails(count uint32) ([]Email, error) {
 	if a.mail == nil {
 		return nil, errors.New("not connected to the mail server")
 	}
-	messages, err := a.mail.GetMessages("INBOX", 10)
+	messages, err := a.mail.GetMessages("INBOX", count)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,6 +68,13 @@ func (a *App) FetchEmails() ([]Email, error) {
 				break
 			}
 		}
+		isStarred := false
+		for _, flag := range msg.Flags {
+			if flag == imap.FlaggedFlag {
+				isStarred = true
+				break
+			}
+		}
 
 
 		if msg.Envelope == nil {
@@ -80,12 +87,20 @@ func (a *App) FetchEmails() ([]Email, error) {
 			from = fmt.Sprintf("%s <%s@%s>",addr.PersonalName, addr.MailboxName, addr.HostName)
 		}
 
+		var subject string
+		if msg.Envelope.Subject == "" {
+			subject = "(No Subject)"
+		} else {
+			subject = msg.Envelope.Subject
+		}
+
 		email := Email{
 			SeqNum: msg.SeqNum,
 			From: from,
-			Subject: msg.Envelope.Subject,
+			Subject: subject,
 			Date: msg.Envelope.Date.Format("02 Jan 2006 15:04"),
 			IsRead: isRead,
+			IsStarred: isStarred,
 		}
 		emails = append(emails, email)
 	}
@@ -156,6 +171,30 @@ func (a *App) ToggleRead(seqNum uint32, currentStateIsRead bool) (string, error)
 	return "Read Status Updated", nil
 }
 
+func (a *App) ToggleStarred(seqNum uint32, currentStateIsStarred bool) (string, error) {
+	if a.mail == nil || a.mail.Client == nil {
+		return "", errors.New("Connect to a server first")
+	}
+
+	seqset := new(imap.SeqSet)
+	seqset.AddNum(seqNum)
+
+	var op imap.FlagsOp
+	op = imap.AddFlags
+	if currentStateIsStarred {
+		op = imap.RemoveFlags
+	}
+	item := imap.FormatFlagsOp(op, true)
+
+	flag := imap.FlaggedFlag
+
+	err := a.mail.Client.Store(seqset, item, []interface{}{flag}, nil)
+	if err != nil {
+		return "", err
+	}
+
+	return "Starred Status Updated", nil
+}
 
 func (a *App) shutdown(ctx context.Context) {
 	if a.mail != nil {
