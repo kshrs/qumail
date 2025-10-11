@@ -168,4 +168,158 @@ onMounted(() => {
 });
 </script>
 
-<style src="../assets/styles/EmailList.css"></style>
+<style scoped>
+
+.main-emaillist {
+    border-radius: 40px;
+}
+.inbox-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+
+.inbox-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #f8f9fb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.more-menu {
+  color: black;
+  border-radius: 25px;
+}
+
+.more-menu:hover {
+  background-color: #f6f6f6;
+  color: black;
+  border-radius: 25px;
+  transition: background 0.28s;
+
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: black;
+}
+
+.options-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px;
+}
+
+.email-checkbox {
+  cursor: pointer;
+}
+
+.email-list {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.email-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  opacity: 1;
+}
+
+.email-row:hover {
+  background-color: #f7f9fc;
+}
+
+.email-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 60px;
+}
+
+.email-sender {
+  font-weight: 600;
+  color: #333;
+  width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.email-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.email-subject {
+  font-weight: 500;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.email-date {
+  width: 100px;
+  text-align: right;
+  color: black;
+}
+
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+}
+
+.star-btn:hover {
+  color: #f5c518;
+}
+
+.fa-solid.fa-star {
+  color: #f5c518;
+}
+
+
+.email-row.is-selected {
+  background-color: #e8f0fe;
+}
+
+
+.email-row.is-read {
+  opacity: 0.7;
+}
+
+
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #666;
+  font-weight: 500;
+}
+
+.loader i {
+  margin-right: 10px;
+}
+</style>
