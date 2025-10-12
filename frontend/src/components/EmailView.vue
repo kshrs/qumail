@@ -5,6 +5,12 @@
         <button class="options-btn" title="Archive"><i class="fa-solid fa-box-archive"></i></button>
         <button class="options-btn" title="Delete"><i class="fa-solid fa-trash"></i></button>
         <button class="options-btn" title="More options"><i class="fa-solid fa-ellipsis-v"></i></button>
+        <button class="send-btn">
+            <span>Decrypt</span>
+            <div class="material-symbols-outlined">
+                lock_open_right
+            </div>
+        </button>
       </div>
     </div>
 
@@ -32,46 +38,52 @@
       
       <div v-if="props.email.attachments && props.email.attachments.length > 0" class="attachments-container">
         <div v-for="(file, index) in props.email.attachments" :key="index" class="attachment-pill">
-          <i class="fa-solid fa-paperclip"></i>
-          <span>{{ file.name }} ({{ file.size }})</span>
-          <button class="download-btn" title="Download">&darr;</button>
+          <div class="material-symbols-outlined">attachment</div>
+          <span>{{ file.name }} ({{ file.formattedSize }})</span>
+          <button class="download-btn" title="Download" @click="downloadAttachment(file)">
+              <div class="material-symbols-outlined">download</div>
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="email-view-footer">
-      <button class="footer-action-btn">
-        <i class="fa-solid fa-reply"></i>
-        <span>Reply</span>
-      </button>
-      <button class="footer-action-btn">
-        <i class="fa-solid fa-reply-all"></i>
-        <span>Reply All</span>
-      </button>
-      <button class="footer-action-btn">
-        <i class="fa-solid fa-share"></i>
-        <span>Forward</span>
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup>
+import { DownloadAttachment } from '../../wailsjs/go/main/App';
 
+// 1. Accept the new 'section' prop
 const props = defineProps({
-  email: {
-    type: Object,
-    required: true,
-  },
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
+    email: {
+        type: Object,
+        required: true,
+    },
+    section: {
+        type: String,
+        required: true,
+    }
 });
-
 
 defineEmits(['close']);
 
+// 2. Update the download function to pass the section
+const downloadAttachment = async (attachment) => {
+    console.log("Trying to download");
+    if (!props.email || !props.email.seqNum) return;
+    console.log("Still Trying");
+
+    try {
+        console.log(`Downloading ${attachment.name} from section ${props.section}...`);
+        
+        // 3. Pass props.section as the third argument
+        const result = await DownloadAttachment(props.email.seqNum, attachment.name, props.section);
+
+        console.log(result);
+    } catch (err) {
+        console.error("Download failed:", err);
+    }
+}
 </script>
 
 <style scoped>
@@ -90,12 +102,12 @@ defineEmits(['close']);
   align-items: center;
   padding: 8px 16px;
   border-bottom: 1px solid #eef1f5;
-  flex-shrink: 0;
   gap: 8px;
 }
 
 .header-actions {
   display: flex;
+  width: 100%;
   gap: 8px;
 }
 .back-btn, .options-btn {
@@ -205,5 +217,26 @@ defineEmits(['close']);
   background-color: #f8f9fa;
   border-color: #c6c6c6;
   box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+.send-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #8575db;  
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.send-btn:hover {
+  background-color: #9775db;
+}
+.send-btn:active {
+  transform: scale(0.98);
 }
 </style>

@@ -9,11 +9,19 @@ type Email struct {
 	IsStarred bool `json:"isStarred"`
 }
 
+// Represents a single attachment's metadata
+type Attachment struct {
+	Name string `json:"name"` // Matches the `file.name` in your Vue component
+	Size int64  `json:"size"` // Matches the `file.size`
+	FormattedSize string `json:"formattedSize"`
+}
+
 type FullEmail struct {
+	SeqNum uint32 `json:"seqNum"`
 	From string `json:"from"`
 	To string `json:"to"`
 	Cc string `json:"cc"`
 	Subject string `json:"subject"`
 	Body string `json:"body"`
-	// Attachements - Future Work
+	Attachments []Attachment `json:"attachments"`
 }

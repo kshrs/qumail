@@ -11,7 +11,7 @@
       @open-drafts="showSectionView('drafts')"
       @open-spam="showSectionView('spam')"
       @open-trash="showSectionView('trash')"
-      @open-all="showSectionView('all')"
+      @open-allmail="showSectionView('allmail')"
       @open-important="showSectionView('important')"
     />
 
@@ -27,20 +27,21 @@
 
       <div id="app">
         <ToolBar />
+
         <Compose
           v-if="currentView === 'compose'"
           @close="showInboxView"
         />
+
         <EmailView
           v-else-if="currentView === 'emailview'"
           :email="emailToView"
-          @close="closeEmailView"
+          :section="sectionMap.get(previousView)" @close="closeEmailView"
         />
+
         <EmailList
           v-else
-          ref="emailListComponent"
-          :section="sectionToView"
-          @viewEmail="openEmailView"
+          :section="sectionMap.get(currentView)" :key="currentView" @viewEmail="openEmailView"
         />
       </div>
     </div>
@@ -50,35 +51,26 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { ReadEmail } from '../wailsjs/go/main/App';
-import { EventsOn } from '../wailsjs/runtime/runtime'; // Import EventsOn
+// REMOVED EventsOn: No longer needed here as the child component will handle its own loading
 import Compose from './components/Compose.vue';
 import EmailList from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';
 import ToolBar from './components/ToolBar.vue';
 import EmailView from './components/EmailView.vue';
-import Home from './components/Home.vue';
 
 const sidebarOpen = ref(true);
-const isLoading = ref(false); // Parent now controls global loading
+const isLoading = ref(false);
 
-const currentView = ref('inbox');
-const sectionToView = ref('INBOX'); // Holds the IMAP folder name
-const previousView = ref('inbox'); // To remember where to go back to
+// --- MODIFIED STATE MANAGEMENT ---
+const currentView = ref('inbox');   // Holds the simple key like 'inbox', 'sent', 'compose'
+const previousView = ref('inbox');  // Remembers the last mailbox key
 const emailToView = ref(null);
-const emailListComponent = ref(null); // A ref to the EmailList component instance
+// REMOVED: emailListComponent ref is no longer needed because of the :key binding
 
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value;
 };
-
-// Close sidebar on ESC key
-const onKey = (e) => {
-  if (e.key === 'Escape') {
-    sidebarOpen.value = false;
-  }
-};
-
 
 // A map to translate simple names to Gmail's IMAP folder names
 const sectionMap = new Map([
@@ -93,7 +85,6 @@ const sectionMap = new Map([
 ]);
 
 const showComposeView = () => {
-  emailToView.value = null;
   currentView.value = 'compose';
 };
 
@@ -102,17 +93,20 @@ const showInboxView = () => {
 };
 
 const showSectionView = (sectionKey) => {
-  emailToView.value = null;
-  sectionToView.value = sectionMap.get(sectionKey) || 'INBOX';
-  currentView.value = sectionKey; // All list views are technically the 'inbox' type view
+  // This function now only needs to update the current view key
+  currentView.value = sectionKey;
 };
 
 const openEmailView = async (email) => {
   isLoading.value = true;
   try {
-    const fullEmailData = await ReadEmail(email.seqNum, sectionToView.value); // Pass section for context
+    // 4. ADDED: Capture the current view *before* switching to emailview
+    previousView.value = currentView.value;
+
+    const currentSectionIMAP = sectionMap.get(currentView.value);
+    const fullEmailData = await ReadEmail(email.seqNum, currentSectionIMAP);
+    
     emailToView.value = fullEmailData;
-    previousView.value = currentView.value; // Remember the view we came from
     currentView.value = 'emailview';
   } catch (err) {
     console.error(err);
@@ -123,20 +117,12 @@ const openEmailView = async (email) => {
 
 const closeEmailView = () => {
   emailToView.value = null;
-  currentView.value = previousView.value; // Go back to the previous view
-  // No need to reload here, the watcher in EmailList handles it if the section changed
+  // 5. MODIFIED: Go back to the correct previous view (e.g., 'sent', not just 'inbox')
+  currentView.value = previousView.value;
 };
 
-onMounted(() => {
-  // Solve the race condition: Wait for the Go backend to be ready
-  EventsOn("backend:ready", () => {
-    console.log("Backend is ready, loading initial emails.");
-    if (emailListComponent.value) {
-      emailListComponent.value.loadEmails();
-    }
-  });
-});
 </script>
+
 
 <style>
 /* Reset */

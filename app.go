@@ -21,6 +21,22 @@ import (
 	// "github.com/emersion/go-imap/client"
 )
 
+func formatBytes(b int64) string {
+	if b == 0 {
+		return "0 B"
+	}
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(b)/float64(div), "KMGTPE"[exp])
+}
+
 // App struct
 type App struct {
 	ctx context.Context
@@ -266,6 +282,8 @@ func (a *App) ReadEmail(seqNum uint32) (FullEmail, error) {
 	}
 
 	var fullEmail FullEmail
+	fullEmail.SeqNum = seqNum
+	
 	r := msg.GetBody(section)
 	if r == nil {
 		return FullEmail{}, errors.New("could not get message body")
@@ -276,6 +294,8 @@ func (a *App) ReadEmail(seqNum uint32) (FullEmail, error) {
 		return FullEmail{}, err
 
 	}
+
+	fullEmail.Attachments = []Attachment{}
 
 	header := mr.Header
 	fullEmail.From = header.Get("From")
@@ -299,11 +319,105 @@ func (a *App) ReadEmail(seqNum uint32) (FullEmail, error) {
 					bodyBytes, _ :=  ioutil.ReadAll(p.Body)
 					fullEmail.Body = string(bodyBytes)
 				}
+			case *mail.AttachmentHeader:
+			// This is an attachment. Get its filename.
+			filename, err := h.Filename()
+			if err != nil {
+				log.Printf("Could not get attachment filename: %v", err)
+				continue
+			}
+
+			// Get the size by reading and discarding the body.
+			// This is more memory-efficient than reading it all into a buffer.
+			size, err := io.Copy(ioutil.Discard, p.Body)
+			if err != nil {
+				log.Printf("Could not get attachment size: %v", err)
+				continue
+			}
+
+			// Add the attachment metadata to our slice
+			fullEmail.Attachments = append(fullEmail.Attachments, Attachment{
+				Name: filename,
+				Size: size,
+				FormattedSize: formatBytes(size),
+			})
+		}
+	}
+	return fullEmail, nil
+}
+
+// DownloadAttachment finds an attachment by name and saves it to a user-chosen location.
+func (a *App) DownloadAttachment(seqNum uint32, filename string, section string) (string, error) {
+	if a.mail == nil || a.mail.Client == nil {
+		return "", errors.New("not connected to a server")
+	}
+	_, err := a.mail.Client.Select(section, false)
+    if err != nil {
+        return "", fmt.Errorf("could not select mailbox '%s': %w", section, err)
+    }
+
+	// Fetch the full email body
+	seqset := new(imap.SeqSet)
+	seqset.AddNum(seqNum)
+	bodySection := &imap.BodySectionName{}
+	items := []imap.FetchItem{bodySection.FetchItem()}
+	messages := make(chan *imap.Message, 1)
+	if err := a.mail.Client.Fetch(seqset, items, messages); err != nil {
+		return "", fmt.Errorf("could not fetch email: %w", err)
+	}
+	msg := <-messages
+	if msg == nil {
+		return "", errors.New("email not found")
+	}
+
+	// Parse the email
+	r := msg.GetBody(bodySection)
+	mr, err := mail.CreateReader(r)
+	if err != nil {
+		return "", fmt.Errorf("could not parse email: %w", err)
+	}
+
+	// Loop through parts to find the matching attachment
+	for {
+		p, err := mr.NextPart()
+		if err == io.EOF {
+			break // Reached the end without finding the attachment
+		} else if err != nil {
+			continue // Skip broken parts
+		}
+
+		if h, ok := p.Header.(*mail.AttachmentHeader); ok {
+			attachmentFilename, _ := h.Filename()
+			if attachmentFilename == filename {
+				// We found the attachment! Now, save it.
+				savePath, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+					DefaultFilename: filename,
+					Title:           "Save Attachment",
+				})
+				if err != nil {
+					return "", err
+				}
+				if savePath == "" {
+					return "Download cancelled by user.", nil // User closed the dialog
+				}
+
+				// Read the attachment data
+				attachmentData, err := ioutil.ReadAll(p.Body)
+				if err != nil {
+					return "", fmt.Errorf("could not read attachment data: %w", err)
+				}
+
+				// Write the data to the chosen file path
+				if err := os.WriteFile(savePath, attachmentData, 0644); err != nil {
+					return "", fmt.Errorf("could not save attachment: %w", err)
+				}
+
+				return fmt.Sprintf("Successfully saved to %s", savePath), nil
+			}
 		}
 	}
 
-	return fullEmail, nil
-
+	return "", fmt.Errorf("attachment '%s' not found in email", filename)
 }
 
 func (a *App) PickFiles() ([]string, error) {
