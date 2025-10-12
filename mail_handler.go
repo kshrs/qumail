@@ -8,3 +8,12 @@ type Email struct {
 	IsRead bool `json:"isRead"`
 	IsStarred bool `json:"isStarred"`
 }
+
+type FullEmail struct {
+	From string `json:"from"`
+	To string `json:"to"`
+	Cc string `json:"cc"`
+	Subject string `json:"subject"`
+	Body string `json:"body"`
+	// Attachements - Future Work
+}

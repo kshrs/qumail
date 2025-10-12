@@ -139,4 +139,3 @@ func (m *Mail) GetMessages(mailbox string, count uint32) ([]*imap.Message, error
 
 	return messages, nil
 }
-

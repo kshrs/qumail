@@ -1,67 +1,76 @@
 <template>
   <div class="app-container">
-    <ToolBar />
-    <!-- Sidebar -->
-    <hsidebar 
-        class="sidebar" 
-        :visible="sidebarOpen" 
-        @open-compose="showComposeView" 
-        @open-inbox="showInboxView"
-
+    <hsidebar
+      class="sidebar"
+      :visible="sidebarOpen"
+      :active-view="currentView"
+      @open-compose="showComposeView"
+      @open-inbox="showSectionView('inbox')"
+      @open-sent="showSectionView('sent')"
+      @open-starred="showSectionView('starred')"
+      @open-drafts="showSectionView('drafts')"
+      @open-spam="showSectionView('spam')"
+      @open-trash="showSectionView('trash')"
+      @open-all="showSectionView('all')"
+      @open-important="showSectionView('important')"
     />
 
-    <!-- Main content -->
+    <div v-if="isLoading" class="loader-overlay">
+      <div class="loader">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>Loading...</span>
+      </div>
+    </div>
+
     <div :class="['main-content', { 'with-sidebar': sidebarOpen }]">
       <TopBar class="topbar" @toggle-sidebar="toggleSidebar" />
 
       <div id="app">
-          <Compose
-            v-if="currentView === 'compose'"
-            @close="showInboxView"
-          />
-          <Inbox
-            v-if="currentView === 'inbox'"
-          />
+        <ToolBar />
+        <Compose
+          v-if="currentView === 'compose'"
+          @close="showInboxView"
+        />
+        <EmailView
+          v-else-if="currentView === 'emailview'"
+          :email="emailToView"
+          @close="closeEmailView"
+        />
+        <EmailList
+          v-else
+          ref="emailListComponent"
+          :section="sectionToView"
+          @viewEmail="openEmailView"
+        />
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { ReadEmail } from '../wailsjs/go/main/App';
+import { EventsOn } from '../wailsjs/runtime/runtime'; // Import EventsOn
 import Compose from './components/Compose.vue';
-import Inbox from './components/EmailList.vue';
+import EmailList from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';
 import ToolBar from './components/ToolBar.vue';
+import EmailView from './components/EmailView.vue';
+import Home from './components/Home.vue';
 
 const sidebarOpen = ref(true);
-
-
-function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value;
-}
+const isLoading = ref(false); // Parent now controls global loading
 
 const currentView = ref('inbox');
+const sectionToView = ref('INBOX'); // Holds the IMAP folder name
+const previousView = ref('inbox'); // To remember where to go back to
+const emailToView = ref(null);
+const emailListComponent = ref(null); // A ref to the EmailList component instance
 
-const showComposeView = () => {
-    currentView.value = 'compose';
-    sidebarOpen.value = true;
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value;
 };
-
-const showInboxView = () => {
-    currentView.value = 'inbox';
-};
-
-//const openCompose = () => {
-//  isComposeOpen.value = true;
-//  sidebarOpen.value = true;
-//};
-//
-//const closeCompose = () => {
-//  isComposeOpen.value = false;
-//};
 
 // Close sidebar on ESC key
 const onKey = (e) => {
@@ -70,12 +79,62 @@ const onKey = (e) => {
   }
 };
 
-onMounted(() => {
-  window.addEventListener('keydown', onKey);
-});
 
-onUnmounted(() => {
-  window.removeEventListener('keydown', onKey);
+// A map to translate simple names to Gmail's IMAP folder names
+const sectionMap = new Map([
+  ['inbox', 'INBOX'],
+  ['sent', '[Gmail]/Sent Mail'],
+  ['starred', '[Gmail]/Starred'],
+  ['drafts', '[Gmail]/Drafts'],
+  ['spam', '[Gmail]/Spam'],
+  ['trash', '[Gmail]/Trash'],
+  ['allmail', '[Gmail]/All Mail'],
+  ['important', '[Gmail]/Important'],
+]);
+
+const showComposeView = () => {
+  emailToView.value = null;
+  currentView.value = 'compose';
+};
+
+const showInboxView = () => {
+  showSectionView('inbox');
+};
+
+const showSectionView = (sectionKey) => {
+  emailToView.value = null;
+  sectionToView.value = sectionMap.get(sectionKey) || 'INBOX';
+  currentView.value = sectionKey; // All list views are technically the 'inbox' type view
+};
+
+const openEmailView = async (email) => {
+  isLoading.value = true;
+  try {
+    const fullEmailData = await ReadEmail(email.seqNum, sectionToView.value); // Pass section for context
+    emailToView.value = fullEmailData;
+    previousView.value = currentView.value; // Remember the view we came from
+    currentView.value = 'emailview';
+  } catch (err) {
+    console.error(err);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const closeEmailView = () => {
+  emailToView.value = null;
+  currentView.value = previousView.value; // Go back to the previous view
+  // No need to reload here, the watcher in EmailList handles it if the section changed
+};
+
+onMounted(() => {
+  // Solve the race condition: Wait for the Go backend to be ready
+  EventsOn("backend:ready", () => {
+    console.log("Backend is ready, loading initial emails.");
+    if (emailListComponent.value) {
+      emailListComponent.value.loadEmails();
+    }
+  });
 });
 </script>
 
@@ -93,6 +152,35 @@ body {
   background-color: #fff;
 }
 
+/* Style the new loader overlay */
+.loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  color: #666;
+  font-weight: 500;
+  font-size: 1.2em;
+}
+
+.loader i {
+  margin-right: 15px;
+  font-size: 1.5em;
+}
+
 /* App layout */
 .app-container {
   height: 100vh;
@@ -107,16 +195,17 @@ body {
   left: 0;
   width: 100%;
   height: 56px;
-  z-index: 1001;
+  z-index: 100;
 }
 
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
+  height: 96vh;
   width: 300px;
   z-index: 1000;
+  margin-top: 0;
   
   transition: margin-left 0.28ms ease-in, width 0.28ms ease-in-out;
 }
@@ -172,7 +261,6 @@ body {
   left: 0;
   width: 300px;
   background: #f5f5f5;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
   border-right: 1px solid #e0e0e0;
   height: 100%;
   padding-top: 56px;

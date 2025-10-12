@@ -22,6 +22,26 @@ export namespace main {
 	        this.isStarred = source["isStarred"];
 	    }
 	}
+	export class FullEmail {
+	    from: string;
+	    to: string;
+	    cc: string;
+	    subject: string;
+	    body: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new FullEmail(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.from = source["from"];
+	        this.to = source["to"];
+	        this.cc = source["cc"];
+	        this.subject = source["subject"];
+	        this.body = source["body"];
+	    }
+	}
 
 }
 

@@ -7,15 +7,25 @@
           <span>Compose</span>
         </button>
       </div>
-      <HMenuList @open-inbox="$emit('open-inbox')" />
+      <HMenuList 
+      :active-view="activeView"
+      @open-inbox="$emit('open-inbox')"
+      @open-sent="$emit('open-sent')"
+      @open-spam="$emit('open-spam')"
+      @open-drafts="$emit('open-drafts')"
+      @open-trash="$emit('open-trash')"
+      @open-allmail="$emit('open-allmail')"
+      @open-starred="$emit('open-starred')"
+      @open-important="$emit('open-important')"
+      />
     </div>
   </transition>
 </template>
 
 <script setup>
 import HMenuList from './HMenuList.vue';
-defineProps({ visible: Boolean });
-defineEmits(['open-compose', 'open-inbox']);
+defineProps({ visible: Boolean, activeView: String });
+defineEmits(['open-compose', 'open-inbox', 'open-sent', 'open-spam', 'open-drafts', 'open-trash', 'open-allmail', 'open-starred', 'open-important']);
 
 </script>
 

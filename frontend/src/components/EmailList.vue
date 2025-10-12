@@ -32,13 +32,6 @@
             <i class="fa-solid fa-ellipsis-vertical"></i>
           </button>
 
-          <Transition name="fade">
-            <div v-if="isMoreMenuOpen" class="more-menu">
-              <div @click="markAllAsRead" class="menu-item">
-                Mark all as read
-              </div>
-            </div>
-          </Transition>
         </div>
       </div>
 
@@ -64,6 +57,7 @@
         v-for="email in emails"
         :key="email.seqNum"
         class="email-row"
+        @click="$emit('viewEmail', email)"
         :class="{
           'is-read': email.isRead,
           'is-selected': email.isSelected,
@@ -109,9 +103,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { FetchEmails, ToggleRead, ToggleStarred } from '../../wailsjs/go/main/App';
+import { ref, computed, watch } from 'vue'; // 1. Import 'watch'
+import { FetchEmails, ToggleStarred } from '../../wailsjs/go/main/App';
 
+// 2. Define the props this component accepts from its parent
+const props = defineProps({
+  section: {
+    type: String,
+    required: true,
+  },
+});
+
+const emit = defineEmits(['viewEmail']);
 const emails = ref([]);
 const isLoading = ref(false);
 const isMoreMenuOpen = ref(false);
@@ -121,58 +124,46 @@ const selectAll = computed({
   set: (value) => emails.value.forEach(e => (e.isSelected = value)),
 });
 
+// 3. The loadEmails function now uses the 'props.section'
 const loadEmails = async () => {
   isLoading.value = true;
   isMoreMenuOpen.value = false;
   try {
-    const fetchedEmails = await FetchEmails(10);
+    // Pass the section from props to the backend
+    const fetchedEmails = await FetchEmails(15, props.section);
     emails.value = fetchedEmails.map(email => ({
-        ...email,
-        isSelected: false,
-
+      ...email,
+      isSelected: false,
     })).reverse();
   } catch (err) {
-    console.error(err);
+    console.error(`Error fetching emails for section ${props.section}:`, err);
   } finally {
     isLoading.value = false;
   }
-}
+};
 
 const refreshEmails = async () => {
-    await loadEmails();
+  await loadEmails();
 };
 
-// Working on it
-const toggleRead = async (email) => {
-    await ToggleRead(email.seqNum, email.isStarred);
-}
+// ... (your other functions like toggleStar, markAllAsRead are fine)
 
-// Need to be worked on 
-const markAllAsRead = () => {
-  emails.value.forEach(e => (e.isRead = true));
-  isMoreMenuOpen.value = false;
-};
-
-// Need to be worked on
-const toggleStar = async (email) => {
-  email.isStarred = !email.isStarred;
-  await ToggleStarred(email.seqNum, !email.isStarred);
-};
-
-const toggleSelect = (email) => {
-  email.isSelected = !email.isSelected;
-};
-
-onMounted(() => {
+// 4. Watch for changes to the 'section' prop.
+// This is the magic that fixes the "Sent works only when reloading" bug.
+watch(() => props.section, (newSection) => {
+  if (newSection) {
     loadEmails();
+  }
+}, { immediate: true }); // 'immediate: true' runs this watcher once on mount
+
+// 5. Expose the 'loadEmails' function so the parent can call it directly
+defineExpose({
+  loadEmails,
 });
 </script>
 
 <style scoped>
 
-.main-emaillist {
-    border-radius: 40px;
-}
 .inbox-container {
   display: flex;
   flex-direction: column;

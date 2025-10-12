@@ -1,71 +1,102 @@
 <template>
   <ul class="List">
-    <li @click="$emit('open-inbox')">
-      <a href="#">
-        <span class="material-symbols-outlined">inbox</span>
-        Inbox
-      </a>
+    <li :class="{ active: activeView === 'inbox' }" @click="$emit('open-inbox')">
+      <span class="material-symbols-outlined">inbox</span>
+      Inbox
     </li>
-    <li>
-      <a href="#">
-        <span class="material-symbols-outlined">send</span>
-        Sent Items
-      </a>
+    
+    <li :class="{ active: activeView === 'sent' }" @click="$emit('open-sent')">
+      <span class="material-symbols-outlined">send</span>
+      Sent
     </li>
-    <li>
-      <a href="#">
-        <span class="material-symbols-outlined">draft</span>
-        Drafts
-      </a>
+    
+    <li :class="{ active: activeView === 'spam' }" @click="$emit('open-spam')">
+      <span class="material-symbols-outlined">dangerous</span>
+      Spam
+    </li>
+    <li :class="{ active: activeView === 'drafts' }" @click="$emit('open-drafts')">
+      <span class="material-symbols-outlined">draft</span>
+      Drafts
+    </li>
+    <li :class="{ active: activeView === 'trash' }" @click="$emit('open-trash')">
+      <span class="material-symbols-outlined">delete</span>
+      Trash
+    </li>
+    <li :class="{ active: activeView === 'allmail' }" @click="$emit('open-allmail')">
+      <span class="material-symbols-outlined">all_inbox</span>
+      All Mail
+    </li>
+    <li :class="{ active: activeView === 'starred' }" @click="$emit('open-starred')">
+      <span class="material-symbols-outlined">star</span>
+      Starred
+    </li>
+    <li :class="{ active: activeView === 'important' }" @click="$emit('open-important')">
+      <span class="material-symbols-outlined">flag_2</span>
+      Important
     </li>
   </ul>
 </template>
 
 <script setup>
-defineEmits(['open-inbox']);
+// 1. Define the prop the component will receive
+defineProps({
+  activeView: String
+});
+
+// 2. Define all possible events this component can emit
+defineEmits(['open-inbox', 'open-sent', 'open-drafts', 'open-spam', 'open-trash', 'open-allmail', 'open-starred', 'open-important']);
 </script>
 
 <style>
+
 * {
   padding: 0px;
   margin: 0px;
 }
+
 .List {
+  -webkit-user-select: none;
   list-style: none;
   padding: 0;
   margin-top: 8px;
 }
+
 .List li {
-  margin-bottom: 20px;
   padding: 5px;
-  border-radius: 3px; /* Add radius here */
+  border-radius: 5px; /* Add radius here */
   cursor: pointer;   /* Make it look clickable */
-}
-.List li a {
-  color: black;
-  text-decoration: none;
+  text-align: left;
+  padding: 10px;
   font-size: 20px;
-  display: flex;
+  margin-top: 1px;
 }
 
-/* FIX: Target the 'li' element for hover, active, and focus, 
-  not the whole list.
-*/
+
 .List li:hover {
   background: #e3f0ff;
 }
+
 .List li:active {
   background: #ccdff6;
 }
+
 .List li:focus-within { /* Use focus-within for better accessibility */
   background: #ccdff6;
   box-shadow: 0 0 0 4px #ccdff6;
 }
 
+
 .material-symbols-outlined {
   margin-right: 6px;
   margin-top: 1px;
   font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48;
-  font-size: 22px;
+  font-size: 20px;
+
+}
+
+/* 3. Add a style for the new .active class */
+.List li.active {
+  background: #ccdff6;
+  font-weight: 600; /* Make the text bold */
 }
 </style>

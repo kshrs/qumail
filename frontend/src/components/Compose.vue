@@ -58,7 +58,7 @@
     </div>
     <div class="compose-footer">
       <button class="send-btn" @click="handleSendClick">
-        <span>Send</span>
+          <span>{{ sendingText }}</span>
         <i class="fa-solid fa-paper-plane"></i>
       </button>
       <div class="footer-options">
@@ -115,6 +115,8 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { SendEmail, PickFiles } from '../../wailsjs/go/main/App';
 
+const sendingText = ref('Send');
+
 const emit = defineEmits(['close']);
 
 const to = ref('');
@@ -126,6 +128,7 @@ const showCc = ref(false);
 const showBcc = ref(false);
 
 const attachments = ref<{ name: string, path: string }[]>([]);
+
 
 
 const showConfirmDialog = ref(false);
@@ -235,6 +238,7 @@ const sendEmail = async () => {
 
   const attachmentPaths = attachments.value.map(file => file.path);
   try {
+    sendingText.value = 'Sending ...'
     const result = await SendEmail(
     to.value,
     cc.value,
@@ -247,6 +251,8 @@ const sendEmail = async () => {
   } catch (err) {
     alert(`Error sending Email: ${err}`);
     console.error(err)
+  } finally {
+    sendingText.value = 'Send';
   }
 };
 </script>
@@ -254,7 +260,7 @@ const sendEmail = async () => {
 <style scoped>
 .compose-view {
   width: 100%;
-  height: 100%;
+  height: 85%;
   background-color: #ffffff;
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);

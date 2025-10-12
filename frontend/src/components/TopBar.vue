@@ -20,6 +20,7 @@
   left: 0;
   width: 100%;
   z-index: 500;
+  height: 5vh;
   display: flex;
   align-items: center;
   background: #007bff;

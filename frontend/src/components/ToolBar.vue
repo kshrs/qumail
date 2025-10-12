@@ -31,136 +31,156 @@ function deleteAction() {
   <main class="top-bar-container">
     <div class="top-bar">
       <div class="feature-buttons">
-        <!-- Feature Buttons -->
-        <button class="feature-btn report-btn" @click="goTo('#')" title="Report">Report</button>
-        <button class="feature-btn reply-btn" @click="goTo('#')" title="Reply">Reply</button>
-        <button class="feature-btn reply-all-btn" @click="goTo('#')" title="Reply All">Reply All</button>
-        <button class="feature-btn forward-btn" @click="goTo('#')" title="Forward">Forward</button>
-        <button class="feature-btn mark-read-btn" @click="goTo('#')" title="Mark as Read">Mark as Read</button>
-        <button class="feature-btn starred-btn" @click="goTo('#')" title="Starred">Starred</button>
-        <button class="feature-btn important-btn" @click="goTo('#')" title="Important">Important</button>
-        <button class="feature-btn spam-btn" @click="goTo('#')" title="Spam">Spam</button>
-        <button class="feature-btn delete-btn" @click="confirmDelete" title="Delete">Delete</button>
-        <button class="feature-btn settings-btn" @click="goTo('#')" title="Settings">Settings</button>
-      </div>
 
+        <button class="feature-btn report-btn" title="Report">
+          <span class="material-symbols-outlined">report</span>
+          <span class="label">Report</span>
+        </button>
+
+        <button class="feature-btn reply-btn" title="Reply">
+          <span class="material-symbols-outlined">reply</span>
+          <span class="label">Reply</span>
+        </button>
+
+        <button class="feature-btn reply-all-btn" title="Reply All">
+          <span class="material-symbols-outlined">reply_all</span>
+          <span class="label">Reply All</span>
+        </button>
+
+        <button class="feature-btn forward-btn" title="Forward">
+          <span class="material-symbols-outlined">forward</span>
+          <span class="label">Forward</span>
+        </button>
+
+        <button class="feature-btn mark-read-btn" title="Mark as Read">
+          <span class="material-symbols-outlined">mark_as_unread</span>
+          <span class="label">Mark Read</span>
+        </button>
+        
+        <button class="feature-btn starred-btn" title="Starred">
+          <i class="fa-regular fa-star"></i>
+          <span class="label">Star</span>
+        </button>
+
+        <button class="feature-btn spam-btn" title="Spam">
+          <span class="material-symbols-outlined">dangerous</span>
+          <span class="label">Junk</span>
+        </button>
+
+        <button class="feature-btn delete-btn" title="Delete">
+          <span class="material-symbols-outlined">delete</span>
+          <span class="label">Delete</span>
+        </button>
+
+        <div class="separator"></div>
+
+        <button class="feature-btn settings-btn" title="Settings">
+          <span class="material-symbols-outlined">settings</span>
+          <span class="label">Settings</span>
+        </button>
+
+      </div>
     </div>
 
-    <!-- Delete Confirmation Dialog -->
     <div v-if="showDeleteDialog" class="delete-dialog">
-      <p class="delete-dialog-text">Are you sure you want to delete?</p>
-      <div class="delete-dialog-buttons">
-        <button class="dialog-btn confirm-btn" @click="deleteAction">Yes</button>
-        <button class="dialog-btn cancel-btn" @click="cancelDelete">No</button>
-      </div>
-    </div>
+        </div>
   </main>
 </template>
 
 <style scoped>
-/* Top Bar Container */
+/* Main container for the top bar */
 .top-bar-container {
-  padding: 100px;
+  -webkit-user-select: none; /* Prevents text selection */
+  user-select: none;
 }
 
-/* Top Bar Styles */
+/* The bar itself */
 .top-bar {
   display: flex;
   align-items: center;
-  gap: 20px; /* Ensure even spacing between buttons */
-  padding: 10px 12px;
-  background: linear-gradient(180deg, #fbfcfd 0%, #f2f6f9 100%);
-  border: 1px solid rgba(200, 200, 200, 0.6);
-  border-radius: 8px;
+  padding: 4px;
+  background-color: #f5f5f5; /* Outlook's light grey background */
+  border-bottom: 1px solid #e1e1e1;
+  width: 100%;
 }
 
 .feature-buttons {
   display: flex;
-  gap: 20px; /* Ensure even spacing between buttons */
+  align-items: center;
 }
 
+/* Base style for all feature buttons */
 .feature-btn {
-  background: #e2e8f0;
-  color: #1a202c;
-  border: 1px solid #cbd5e0;
-  padding: 6px 12px;
-  border-radius: 4px;
+  display: flex;
+  flex-direction: column; /* Stack icon on top of label */
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px; /* Subtle rounded corners on hover */
   cursor: pointer;
-  position: relative;
-}
-
-.feature-btn:hover {
-  background: #ffffff;
-}
-
-.feature-btn::after {
-  content: attr(title);
-  position: absolute;
-  bottom: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
   padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease-in-out;
+  min-width: 60px; /* Ensure buttons have a uniform width */
+  transition: background-color 0.2s ease-in-out;
 }
 
-.feature-btn:hover::after {
-  opacity: 1;
+/* Hover state for all buttons */
+.feature-btn:hover {
+  background-color: #e1e1e1;
 }
 
-/* Ensure only one hover box is displayed */
-.feature-btn:hover::before {
-  display: none;
+/* --- Icon and Label Base Styles --- */
+.feature-btn .material-symbols-outlined,
+.feature-btn .fa-regular {
+  font-size: 22px;
+  color: #5f6368; /* Default neutral icon color */
+  transition: color 0.2s ease-in-out;
 }
 
-/* Dropdown Container */
-.dropdown-container {
-  position: relative;
+.feature-btn .label {
+  font-size: 11px;
+  margin-top: 2px;
+  color: #5f6368; /* Default neutral text color */
+  transition: color 0.2s ease-in-out;
 }
 
-.readable-select {
-  min-width: 260px;
-  max-width: 420px;
-  text-align: left;
-  padding: 8px 12px;
-  border-radius: 4px;
-  border: 1px solid rgba(150, 150, 150, 0.3);
-  background: white;
-  cursor: pointer;
-  white-space: normal; /* allow wrapping */
+/* --- Specific Hover Colors --- */
+
+/* Blue for primary actions: Reply, Reply All, Forward */
+.reply-btn:hover .material-symbols-outlined,
+.reply-btn:hover .label,
+.reply-all-btn:hover .material-symbols-outlined,
+.reply-all-btn:hover .label,
+.forward-btn:hover .material-symbols-outlined,
+.forward-btn:hover .label {
+  color: #0078d4; /* Outlook's brand blue */
 }
 
-.select-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid #d0d7de;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  border-radius: 6px;
-  z-index: 1000;
-  min-width: 260px;
-  max-width: 420px;
-  margin-top: 6px;
+/* Red for destructive actions: Delete, Report, Junk */
+.delete-btn:hover .material-symbols-outlined,
+.delete-btn:hover .label,
+.report-btn:hover .material-symbols-outlined,
+.report-btn:hover .label,
+.spam-btn:hover .material-symbols-outlined,
+.spam-btn:hover .label {
+  color: #d9534f;
 }
 
-.select-item {
-  padding: 8px 12px;
-  cursor: pointer;
-  color: #111827;
+/* Yellow for Starred */
+.starred-btn:hover .fa-regular,
+.starred-btn:hover .label {
+  color: #f5c518;
 }
 
-.select-item:hover {
-  background: #f3f4f6;
+/* Vertical separator line */
+.separator {
+  height: 32px;
+  width: 1px;
+  background-color: #e1e1e1;
+  margin: 0 8px;
 }
 
-/* Delete Confirmation Dialog */
+/* --- Delete Dialog (minor style tweaks) --- */
 .delete-dialog {
   position: fixed;
   top: 50%;
@@ -173,42 +193,37 @@ function deleteAction() {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 }
-
 .delete-dialog-text {
   margin-bottom: 20px;
   font-size: 16px;
   color: #333;
 }
-
 .delete-dialog-buttons {
   display: flex;
+  justify-content: flex-end;
   gap: 10px;
 }
-
 .dialog-btn {
-  padding: 6px 12px;
-  border: none;
+  padding: 8px 16px;
+  border: 1px solid transparent;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: 600;
 }
-
 .confirm-btn {
-  background: #f87171;
+  background: #d9534f;
+  border-color: #d9534f;
   color: #fff;
 }
-
 .confirm-btn:hover {
-  background: #e01b1b;
-  color: #fff;
+  background: #c9302c;
+  border-color: #c9302c;
 }
-
 .cancel-btn {
   background: #e2e8f0;
   color: #1a202c;
 }
-
 .cancel-btn:hover {
-  background: #353535;
-  color: #c4c7ce;
+  background: #cbd5e0;
 }
 </style>
