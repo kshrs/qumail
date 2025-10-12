@@ -103,10 +103,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'; // 1. Import 'watch'
+import { ref, computed, onMounted, watch } from 'vue';
+// 1. Import all the necessary backend functions
 import { FetchEmails, ToggleStarred } from '../../wailsjs/go/main/App';
+import { EventsOn } from '../../wailsjs/runtime/runtime';
 
-// 2. Define the props this component accepts from its parent
 const props = defineProps({
   section: {
     type: String,
@@ -115,6 +116,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['viewEmail']);
+
 const emails = ref([]);
 const isLoading = ref(false);
 const isMoreMenuOpen = ref(false);
@@ -124,14 +126,12 @@ const selectAll = computed({
   set: (value) => emails.value.forEach(e => (e.isSelected = value)),
 });
 
-// 3. The loadEmails function now uses the 'props.section'
 const loadEmails = async () => {
   isLoading.value = true;
   isMoreMenuOpen.value = false;
   try {
-    // Pass the section from props to the backend
     const fetchedEmails = await FetchEmails(15, props.section);
-    emails.value = fetchedEmails.map(email => ({
+    emails.value = (fetchedEmails || []).map(email => ({
       ...email,
       isSelected: false,
     })).reverse();
@@ -146,17 +146,59 @@ const refreshEmails = async () => {
   await loadEmails();
 };
 
-// ... (your other functions like toggleStar, markAllAsRead are fine)
+const toggleRead = async (email) => {
+  try {
+    // Pass the correct current read status
+    await ToggleRead(email.seqNum, email.isRead);
+    email.isRead = !email.isRead;
+  } catch (err) {
+    console.error("Error toggling read status:", err);
+  }
+};
 
-// 4. Watch for changes to the 'section' prop.
-// This is the magic that fixes the "Sent works only when reloading" bug.
+const markAllAsRead = async () => {
+  isMoreMenuOpen.value = false;
+  try {
+    await MarkAllAsRead();
+    // Refresh the list to see the changes
+    await loadEmails();
+  } catch (err) {
+    console.error("Error marking all as read:", err);
+  }
+};
+
+// --- THIS IS THE CORRECTED FUNCTION ---
+const toggleStar = async (email) => {
+  try {
+    await ToggleStarred(email.seqNum, email.isStarred);
+    // 2. Only update the UI after the backend call is successful
+    email.isStarred = !email.isStarred;
+  } catch (err) {
+    console.error("Error toggling star:", err);
+    // Optional: revert the UI change if the backend fails
+    // email.isStarred = !email.isStarred; 
+  }
+};
+
+const toggleSelect = (email) => {
+  email.isSelected = !email.isSelected;
+};
+
+// Use a watcher to reload emails when the section prop changes
 watch(() => props.section, (newSection) => {
   if (newSection) {
     loadEmails();
   }
-}, { immediate: true }); // 'immediate: true' runs this watcher once on mount
+});
 
-// 5. Expose the 'loadEmails' function so the parent can call it directly
+// Load initial emails only after the backend is ready
+onMounted(() => {
+  EventsOn("backend:ready", () => {
+    loadEmails();
+  });
+});
+
+// Expose the loadEmails function for the parent to use
 defineExpose({
   loadEmails,
 });
@@ -213,6 +255,7 @@ defineExpose({
 
 .email-checkbox {
   cursor: pointer;
+  zoom: 1.4;
 }
 
 .email-list {
@@ -279,7 +322,9 @@ defineExpose({
   border: none;
   cursor: pointer;
   color: #999;
+  font-size: 16px;
 }
+
 
 .star-btn:hover {
   color: #f5c518;

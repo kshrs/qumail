@@ -4,6 +4,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"crypto/rand"
+	"encoding/hex"
 	"os"
 	"slices"
 	"log"
@@ -474,6 +476,51 @@ func (a *App) ToggleStarred(seqNum uint32, currentStateIsStarred bool) (string, 
 	}
 
 	return "Starred Status Updated", nil
+}
+
+// Level-1 One Time Pad functions
+func  (a *App)GenRand(plaintext string) ([]byte, error) {
+    key := make([]byte, len(plaintext))
+    _, err := io.ReadFull(rand.Reader, key)
+    if err != nil {
+        return nil, fmt.Errorf("failed to generate random key: %v", err)
+    }
+    fmt.Printf("Key generation successful: %d bytes of entropy\n", len(key))
+    return key, nil //Key, error
+}
+
+func (a *App)Encrypt(plaintext string,key []byte) (string, string, error) {
+    if len(plaintext) != len(key) {
+    	return "", "", fmt.Errorf("OTP violation: key length (%d) != plaintext length (%d)",
+    		len(key), len(plaintext))
+    }
+    ciphertext := make([]byte, len(plaintext))
+    for i := range plaintext {
+    	ciphertext[i] = plaintext[i] ^ key[i]
+    }
+    fmt.Println("Encryption completed successfully")
+    return hex.EncodeToString(ciphertext), hex.EncodeToString(key), nil //Ciphertext, key, error 
+}
+
+
+func  (a *App)Decrypt(ciphertextStr string, keyHex string) (string, error) {
+    ciphertext, err := hex.DecodeString(ciphertextStr)
+    if err != nil {
+    	return "", fmt.Errorf("failed to decode ciphertext: %v", err)
+    }
+    key, err := hex.DecodeString(keyHex)
+    if err != nil {
+    	return "", fmt.Errorf("failed to decode key: %v", err)
+    }
+    if len(ciphertext) != len(key) {
+    	return "", fmt.Errorf("decryption error: key length (%d) != ciphertext length (%d)",
+    		len(key), len(ciphertext))
+    }
+    plaintext := make([]byte, len(ciphertext))
+    for i := range ciphertext {
+    	plaintext[i] = ciphertext[i] ^ key[i]
+    }
+    return string(plaintext), nil //Decrypted, error
 }
 
 func (a *App) shutdown(ctx context.Context) {
