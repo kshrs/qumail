@@ -55,6 +55,7 @@ import { ReadEmail } from '../wailsjs/go/main/App';
 import { EventsOn } from '../wailsjs/runtime/runtime';
 // REMOVED EventsOn: No longer needed here as the child component will handle its own loading
 import Compose from './components/Compose.vue';
+import Home from './components/Home.vue';
 import EmailList from './components/EmailList.vue';
 import TopBar from './components/TopBar.vue';
 import hsidebar from './components/hsidebar.vue';

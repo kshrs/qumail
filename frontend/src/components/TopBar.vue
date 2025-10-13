@@ -183,20 +183,56 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 .small { background: #2563eb; color:#fff; border:none; padding:6px 8px; border-radius:6px; cursor:pointer }
 
 /* dialog removed: using inline add inside popover */
-.add-dialog-backdrop { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.35); z-index: 2000 }
-.add-dialog { background: black; border-radius: 10px; padding: 16px; width: 320px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-.available-list { display:flex; flex-direction:column; gap:8px; margin-top:8px }
-.available-item { display:flex; justify-content:space-between; align-items:center; padding:8px; border-radius:8px }
-.available-item:hover { background:#f8fafc ;color:black}
-.icon-action{
-  width:50px;
+.add-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35); /* A dark overlay works well for both themes */
+  z-index: 2000;
+}
+
+.add-dialog {
+  background: white; /* Changed from black to white */
+  color: #1a202c; /* Added a default dark text color for content */
+  border-radius: 10px;
+  padding: 16px;
+  width: 320px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); /* Softened shadow for a lighter feel */
+  border: 1px solid #e2e8f0; /* Added a subtle border for definition */
+}
+
+.available-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.available-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  /* Default text color is inherited from .add-dialog */
+}
+
+.available-item:hover {
+  background: #f1f5f9; /* Used a light gray for the hover state */
+  color: #1a202c; /* Ensure text remains dark on hover */
+}
+
+.icon-action {
+  width: 50px;
   height: 50px;
-  background: none;       /* Remove background color */
-  border: none;           /* Remove border */
-  padding: 0;             /* Remove padding */
-  margin: 0;              /* Remove margin (optional) */
-  color: inherit;         /* Inherit text color from parent */
-  font: inherit;          /* Inherit font style */
-  cursor: pointer;        /* Keep pointer cursor */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: inherit; /* This will now inherit the dark text color */
+  font: inherit;
+  cursor: pointer;
 }
 </style>

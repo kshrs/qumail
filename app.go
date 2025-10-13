@@ -18,8 +18,8 @@ import (
 	"github.com/emersion/go-imap"
 	"github.com/emersion/go-message/mail"
 	"golang.org/x/oauth2"
-	//"golang.org/x/oauth2/google"
-	//"google.golang.org/api/gmail/v1"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/gmail/v1"
 	// "github.com/emersion/go-imap/client"
 	//twilio "github.com/twilio/twilio-go"
 	//verify "github.com/twilio/twilio-go/rest/verify/v2"
@@ -96,18 +96,18 @@ func (a *App) startup(ctx context.Context) {
 
 	//a.twilioClient = twilio.NewRestClient()
 
-	//// OAuth Stuff
-	//oauthConfig = &oauth2.Config{
-	//	ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-	//	ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-	//	RedirectURL:  "http://localhost:8080/callback", // Must match what you configure in Google Cloud (optional for desktop apps)
-	//	Scopes:       []string{gmail.MailGoogleComScope},
-	//	Endpoint:     google.Endpoint,
-	//}
+	// OAuth Stuff
+	oauthConfig = &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  "http://localhost:8080/callback", // Must match what you configure in Google Cloud (optional for desktop apps)
+		Scopes:       []string{gmail.MailGoogleComScope},
+		Endpoint:     google.Endpoint,
+	}
 
-	//// Generate the URL for the user to visit
-	//// The "offline" access type is crucial for getting a refresh token
-	//authURL = oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	// Generate the URL for the user to visit
+	// The "offline" access type is crucial for getting a refresh token
+	authURL = oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 
 
 }
