@@ -145,7 +145,8 @@ onMounted(() => {
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #fff;
+  background-color: #121212; /* Zen: Main Background */
+  color: #D1CFC0; /* Zen: Primary Text */
 }
 
 /* Style the new loader overlay */
@@ -155,7 +156,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+  background-color: rgba(18, 18, 18, 0.8); /* Semi-transparent dark */
   z-index: 10;
   display: flex;
   align-items: center;
@@ -167,7 +168,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 30px;
-  color: #666;
+  color: #F76F53; /* Zen: Melon Accent */
   font-weight: 500;
   font-size: 1.2em;
 }
@@ -202,8 +203,8 @@ body {
   width: 300px;
   z-index: 1000;
   margin-top: 0;
-  
-  transition: margin-left 0.28ms ease-in, width 0.28ms ease-in-out;
+  /* Corrected transition timing from ms to s for smoother animation */
+  transition: margin-left 0.28s ease-in, width 0.28s ease-in-out;
 }
 
 .main-content {
@@ -237,7 +238,7 @@ body {
 .welcome-screen {
   flex: 1;
   text-align: left;
-  color: #555;
+  color: #8A8A8A; /* Zen: Secondary Text */
   z-index: 100;
   padding: 12px 0;
   display: flex;
@@ -256,8 +257,8 @@ body {
   top: 0;
   left: 0;
   width: 300px;
-  background: #f5f5f5;
-  border-right: 1px solid #e0e0e0;
+  background: #1E1E1E; /* Zen: UI/Surface Background */
+  border-right: 1px solid #2a2a2a; /* Zen: Subtle Border */
   height: 100%;
   padding-top: 56px;
 }
@@ -269,7 +270,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: #1E1E1E; /* Zen: UI/Surface Background */
 }
 
 #logo {

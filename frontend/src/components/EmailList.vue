@@ -215,36 +215,34 @@ defineExpose({
 </script>
 
 <style scoped>
-
 .inbox-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #fff;
+  background-color: #121212; /* Zen: Main Background */
   font-family: 'Inter', sans-serif;
+  color: #D1CFC0; /* Zen: Primary Text */
 }
-
 
 .inbox-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 16px;
-  background-color: #f8f9fb;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: #1E1E1E; /* Zen: UI Surface */
+  border-bottom: 1px solid #2a2a2a; /* Zen: Subtle Border */
 }
 
 .more-menu {
-  color: black;
+  color: #D1CFC0;
   border-radius: 25px;
 }
 
 .more-menu:hover {
-  background-color: #f6f6f6;
-  color: black;
+  background-color: #333333;
+  color: #D1CFC0;
   border-radius: 25px;
   transition: background 0.28s;
-
 }
 
 .toolbar-left,
@@ -252,7 +250,7 @@ defineExpose({
   display: flex;
   align-items: center;
   gap: 10px;
-  color: black;
+  color: #D1CFC0;
 }
 
 .options-btn {
@@ -261,31 +259,33 @@ defineExpose({
   cursor: pointer;
   font-size: 16px;
   padding: 6px;
+  color: #D1CFC0;
 }
 
 .email-checkbox {
   cursor: pointer;
+  accent-color: #F76F53; /* Zen: Melon Accent for checkbox */
   zoom: 1.4;
 }
 
 .email-list {
   flex: 1;
   overflow-y: auto;
-  background: #fff;
+  background: #121212; /* Zen: Main Background */
 }
 
 .email-row {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #2a2a2a; /* Zen: Subtle Border */
   cursor: pointer;
   transition: background-color 0.2s;
   opacity: 1;
 }
 
 .email-row:hover {
-  background-color: #f7f9fc;
+  background-color: rgba(247, 111, 83, 0.1); /* Zen: Melon Accent Hover */
 }
 
 .email-actions {
@@ -297,13 +297,12 @@ defineExpose({
 
 .email-sender {
   font-weight: 600;
-  color: #333;
+  color: #D1CFC0; /* Zen: Primary Text */
   width: 180px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 
 .email-content {
   flex: 1;
@@ -314,54 +313,53 @@ defineExpose({
 
 .email-subject {
   font-weight: 500;
-  color: #000;
+  color: #8A8A8A; /* Zen: Secondary Text */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding: 0 8px;
 }
 
 .email-date {
   width: 100px;
   text-align: right;
-  color: black;
+  color: #8A8A8A; /* Zen: Secondary Text */
 }
-
 
 .star-btn {
   background: none;
   border: none;
   cursor: pointer;
-  color: #999;
+  color: #8A8A8A; /* Zen: Secondary Text */
   font-size: 16px;
 }
 
-
 .star-btn:hover {
-  color: #f5c518;
+  color: #FFB900; /* Vibrant yellow for hover */
 }
 
 .fa-solid.fa-star {
-  color: #f5c518;
+  color: #FFB900; /* Vibrant yellow for selected star */
 }
-
 
 .email-row.is-selected {
-  background-color: #e8f0fe;
+  background-color: rgba(247, 111, 83, 0.2); /* More prominent accent for selection */
 }
-
 
 .email-row.is-read {
-  opacity: 0.7;
+  opacity: 0.6; /* Dim read emails */
 }
 
-
+.email-row.is-read .email-sender {
+  font-weight: 400; /* Make sender less bold when read */
+}
 
 .loader {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 30px;
-  color: #666;
+  color: #F76F53; /* Zen: Melon Accent for loader */
   font-weight: 500;
 }
 

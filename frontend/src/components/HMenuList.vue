@@ -35,6 +35,14 @@
       Important
     </li>
   </ul>
+  <div class="google-user-profile">
+    <span class="material-symbols-outlined">
+    account_circle
+    </span>
+    <span class="material-symbols-outlined">
+    <label> Kishor</label>
+    </span>
+  </div>
 </template>
 
 <script setup>
@@ -62,41 +70,61 @@ defineEmits(['open-inbox', 'open-sent', 'open-drafts', 'open-spam', 'open-trash'
 }
 
 .List li {
-  padding: 5px;
-  border-radius: 5px; /* Add radius here */
-  cursor: pointer;   /* Make it look clickable */
-  text-align: left;
+  display: flex;
+  align-items: center;
   padding: 10px;
-  font-size: 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px; /* Adjusted for better fit */
   margin-top: 1px;
+  color: #D1CFC0; /* Zen Primary Text */
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 
 .List li:hover {
-  background: #e3f0ff;
+  background: #363636; /* Slightly more prominent accent */
 }
 
+/* Style for the active state (when clicked or selected) */
+.List li.active,
 .List li:active {
-  background: #ccdff6;
+  background: #363636; /* Slightly more prominent accent */
+  color: #d1cfc0; /* Zen Accent Color */
+  font-weight: 600; /* Make the text bold */
+  border-left: 4px solid #f76f53;
 }
 
-.List li:focus-within { /* Use focus-within for better accessibility */
-  background: #ccdff6;
-  box-shadow: 0 0 0 4px #ccdff6;
+.List li:focus-within {
+  box-shadow: 0 0 0 2px rgba(247, 111, 83, 0.4); /* Accessibility focus ring */
+  outline: none;
 }
 
 
 .material-symbols-outlined {
-  margin-right: 6px;
-  margin-top: 1px;
-  font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 48;
-  font-size: 20px;
-
+  margin-right: 16px; /* Increased margin for better spacing */
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  font-size: 22px;
 }
 
-/* 3. Add a style for the new .active class */
-.List li.active {
-  background: #ccdff6;
-  font-weight: 600; /* Make the text bold */
+/* Style for icons within an active list item */
+.List li.active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.google-user-profile {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: 10px;
+  padding: 10px;
+  color: #D1CFC0; /* Zen Primary Text */
+}
+.google-user-profile .material-symbols-outlined {
+  font-size: 24px;
+}
+.google-user-profile .material-symbols-outlined label {
+  font-size: 18px;
 }
 </style>

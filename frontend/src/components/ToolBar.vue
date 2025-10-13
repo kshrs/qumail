@@ -1,34 +1,33 @@
 <script lang="ts" setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { ref } from 'vue'; // Removed unused imports for cleaner code
 
 // --- New Mail Button
 function newMail() {
-  console.log("New Mail Clicked")
+  console.log("New Mail Clicked");
 }
 
 
 // --- Navigation helper
 function goTo(href: string) {
-  window.location.href = href
+  window.location.href = href;
 }
 
 
 // --- Delete button confirmation dialog
-const showDeleteDialog = ref(false)
+const showDeleteDialog = ref(false);
 function confirmDelete() {
-  showDeleteDialog.value = true
+  showDeleteDialog.value = true;
 }
 
 
 function cancelDelete() {
-  showDeleteDialog.value = false
+  showDeleteDialog.value = false;
 }
 
 function deleteAction() {
-  console.log("Delete action confirmed")
-  showDeleteDialog.value = false
+  console.log("Delete action confirmed");
+  showDeleteDialog.value = false;
 }
-
 </script>
 
 <template>
@@ -64,7 +63,7 @@ function deleteAction() {
           <span class="label">Mark Read</span>
         </button>
 
-        
+
 
         <button class="feature-btn starred-btn" title="Starred">
           <i class="fa-regular fa-star"></i>
@@ -94,29 +93,29 @@ function deleteAction() {
 
 
     <div v-if="showDeleteDialog" class="delete-dialog">
-        </div>
+    </div>
   </main>
 </template>
 
 
-<style scoped>
+<style>
 
 /* Main container for the top bar */
-
 .top-bar-container {
-  -webkit-user-select: none; /* Prevents text selection */
+  /* The -webkit-user-select line has been removed */
   user-select: none;
 }
 
 
 /* The bar itself */
-
 .top-bar {
+  border: 2px solid #1e1e1e;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   padding: 4px;
-  background-color: #f5f5f5; /* Outlook's light grey background */
-  border-bottom: 1px solid #e1e1e1;
+  background-color: #1e1e1e; /* Dark background for the bar */
+  margin-bottom: 10px;
   width: 100%;
 }
 
@@ -144,7 +143,7 @@ function deleteAction() {
 
 /* Hover state for all buttons */
 .feature-btn:hover {
-  background-color: #e1e1e1;
+  background-color: #333333; /* Lighter grey for hover feedback */
 }
 
 
@@ -152,7 +151,7 @@ function deleteAction() {
 .feature-btn .material-symbols-outlined,
 .feature-btn .fa-regular {
   font-size: 22px;
-  color: #5f6368; /* Default neutral icon color */
+  color: #d1d1d1; /* Light grey for icons */
   transition: color 0.2s ease-in-out;
 }
 
@@ -160,7 +159,7 @@ function deleteAction() {
 .feature-btn .label {
   font-size: 11px;
   margin-top: 2px;
-  color: #5f6368; /* Default neutral text color */
+  color: #d1d1d1; /* Light grey for text */
   transition: color 0.2s ease-in-out;
 }
 
@@ -168,34 +167,32 @@ function deleteAction() {
 /* --- Specific Hover Colors --- */
 
 
-/* Blue for primary actions: Reply, Reply All, Forward */
-
+/* Bright Blue for primary actions: Reply, Reply All, Forward */
 .reply-btn:hover .material-symbols-outlined,
 .reply-btn:hover .label,
 .reply-all-btn:hover .material-symbols-outlined,
 .reply-all-btn:hover .label,
 .forward-btn:hover .material-symbols-outlined,
 .forward-btn:hover .label {
-  color: #0078d4; /* Outlook's brand blue */
+  color: #00aaff;
 }
 
 
-/* Red for destructive actions: Delete, Report, Junk */
-
+/* Vibrant Red for destructive actions: Delete, Report, Junk */
 .delete-btn:hover .material-symbols-outlined,
 .delete-btn:hover .label,
 .report-btn:hover .material-symbols-outlined,
 .report-btn:hover .label,
 .spam-btn:hover .material-symbols-outlined,
 .spam-btn:hover .label {
-  color: #d9534f;
+  color: #ff4d4d;
 }
 
 
-/* Yellow for Starred */
+/* Rich Gold for Starred */
 .starred-btn:hover .fa-regular,
 .starred-btn:hover .label {
-  color: #f5c518;
+  color: #ffd700;
 }
 
 
@@ -203,30 +200,29 @@ function deleteAction() {
 .separator {
   height: 32px;
   width: 1px;
-  background-color: #e1e1e1;
+  background-color: #3a3a3a; /* Darker separator line */
   margin: 0 8px;
 }
 
 
 /* --- Delete Dialog (minor style tweaks) --- */
-
 .delete-dialog {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #fff;
-  border: 1px solid #ccc;
+  background: #2a2a2a; /* Dark dialog background */
+  border: 1px solid #4a4a4a;
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   z-index: 1000;
 }
 
 .delete-dialog-text {
   margin-bottom: 20px;
   font-size: 16px;
-  color: #333;
+  color: #d1d1d1; /* Light text */
 }
 
 .delete-dialog-buttons {
@@ -244,23 +240,22 @@ function deleteAction() {
 }
 
 .confirm-btn {
-  background: #d9534f;
-  border-color: #d9534f;
-  color: #fff;
+  background: #ff4d4d;
+  border-color: #ff4d4d;
+  color: #ffffff;
 }
 
 .confirm-btn:hover {
-  background: #c9302c;
-  border-color: #c9302c;
+  background: #e60000;
+  border-color: #e60000;
 }
 
 .cancel-btn {
-  background: #e2e8f0;
-  color: #1a202c;
+  background: #4a4a4a;
+  color: #d1d1d1;
 }
 
 .cancel-btn:hover {
-  background: #cbd5e0;
+  background: #5a5a5a;
 }
-
-</style> 
+</style>

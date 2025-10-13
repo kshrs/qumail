@@ -123,20 +123,22 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
   top: 0;
   left: 0;
   width: 100%;
-  height: 7vh;
+  height: 50px;
   z-index: 500;
   display: flex;
   align-items: center;
-  background: #007bff;
+  background: #1E1E1E; /* Zen: UI Surface */
   padding: 12px 24px;
-  padding-top:10px;
-  color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  padding-top: 10px;
+  color: #D1CFC0; /* Zen: Primary Text */
+  box-shadow: none;
+  /* MODIFIED: Changed the border to the melon accent color */
+  border-bottom: 3px solid #363636;
   border-radius: 0;
 }
 .hamburger {
   background: transparent;
-  color: white;
+  color: #D1CFC0; /* Zen: Primary Text */
   border: none;
   font-size: 24px;
   cursor: pointer;
@@ -147,19 +149,28 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
   align-items: center;
 }
 .top-btn {
-  background: transparent;
-  color: white;
+  color: #D1CFC0; /* Zen: Primary Text */
   border: none;
-  margin-right: 20px;
   font-size: 16px;
   cursor: pointer;
   font-weight: bold;
+  transition: color 0.2s ease;
+  background-color: #363636;
+  border-radius: 4px;
+  padding: 5px 7px;
+  margin: 0px 5px;
 }
 .top-btn:last-child {
   margin-right: 0;
 }
 .top-btn:hover {
-  text-decoration: underline;
+  color: #F76F53; /* Zen: Melon Accent */
+  text-decoration: none;
+}
+
+/* NEW: Added an active state style for the selected button */
+.top-btn.active {
+  color: #F76F53;
 }
 
 .plugins-wrapper {
@@ -170,17 +181,18 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
   left: 0;
   top: 40px;
   width: 220px;
-  background: #fff;
-  color: #111;
+  background: #1E1E1E; /* Zen: UI Surface */
+  color: #D1CFC0; /* Zen: Primary Text */
   border-radius: 8px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3); /* Dark theme shadow */
+  border: 1px solid #2a2a2a; /* Zen: Subtle Border */
   padding: 8px;
   z-index: 1200;
 }
 .plugins-list { display:flex; flex-direction:column; gap:8px; }
-.plugin-item { display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-radius:6px; }
-.plugin-item:hover { background: #f3f4f6 }
-.small { background: #2563eb; color:#fff; border:none; padding:6px 8px; border-radius:6px; cursor:pointer }
+.plugin-item { display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-radius:6px; transition: background-color 0.2s ease; }
+.plugin-item:hover { background: rgba(247, 111, 83, 0.1); } /* Zen: Melon Accent Hover */
+.small { background: #363636; color:#d1cfc0; border:none; padding:6px 8px; border-radius:6px; cursor:pointer }
 
 /* dialog removed: using inline add inside popover */
 .add-dialog-backdrop {
@@ -189,18 +201,18 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.35); /* A dark overlay works well for both themes */
+  background: rgba(0, 0, 0, 0.5); /* Darker overlay */
   z-index: 2000;
 }
 
 .add-dialog {
-  background: white; /* Changed from black to white */
-  color: #1a202c; /* Added a default dark text color for content */
+  background: #1E1E1E;
+  color: #D1CFC0;
   border-radius: 10px;
   padding: 16px;
   width: 320px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); /* Softened shadow for a lighter feel */
-  border: 1px solid #e2e8f0; /* Added a subtle border for definition */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid #2a2a2a;
 }
 
 .available-list {
@@ -216,12 +228,12 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
   align-items: center;
   padding: 8px;
   border-radius: 8px;
-  /* Default text color is inherited from .add-dialog */
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .available-item:hover {
-  background: #f1f5f9; /* Used a light gray for the hover state */
-  color: #1a202c; /* Ensure text remains dark on hover */
+  background: rgba(247, 111, 83, 0.1);
+  color: #F76F53;
 }
 
 .icon-action {
@@ -231,7 +243,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
   border: none;
   padding: 0;
   margin: 0;
-  color: inherit; /* This will now inherit the dark text color */
+  color: inherit;
   font: inherit;
   cursor: pointer;
 }

@@ -202,6 +202,7 @@ const handleVerifyCode = async () => {
     }
   } catch (err) {
     alert(`Verification error: ${err}`);
+    showOtpDialog.value = false;
   } finally {
     isLoading.value = false;
   }
@@ -297,8 +298,11 @@ const downloadAttachment = async (attachment) => {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 9vh);
-  background-color: #fff;
+  background-color: #1E1E1E; /* Zen: UI Surface */
+  color: #D1CFC0; /* Zen: Primary Text */
   font-family: 'Segoe UI', sans-serif;
+  border: 2px solid #1e1e1e; /* Zen: Subtle Border */
+  border-radius: 10px;
 }
 
 /* Header */
@@ -306,7 +310,7 @@ const downloadAttachment = async (attachment) => {
   display: flex;
   align-items: center;
   padding: 8px 16px;
-  border-bottom: 1px solid #eef1f5;
+  border-bottom: 1px solid #2a2a2a; /* Zen: Subtle Border */
   gap: 8px;
 }
 
@@ -316,20 +320,20 @@ const downloadAttachment = async (attachment) => {
   gap: 8px;
 }
 .back-btn, .options-btn {
-  background: none; 
-  border: none; 
-  cursor: pointer; 
-  color: #5f6368;
-  font-size: 18px; 
-  width: 40px; 
-  height: 40px; 
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #D1CFC0; /* Zen: Primary Text */
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: center;
   transition: background-color 0.2s ease;
 }
-.back-btn:hover, .options-btn:hover { background-color: #f1f3f4; }
+.back-btn:hover, .options-btn:hover { background-color: #333333; } /* Neutral Hover */
 
 /* Body */
 .compose-body {
@@ -340,34 +344,30 @@ const downloadAttachment = async (attachment) => {
   padding: 8px 24px;
 }
 
-
 /* Form Group - Now a stacked, single-column layout */
 .form-group {
   display: flex;
-  flex-direction: row; /* Stacks the label and value vertically */
-  align-items: flex; /* Aligns items to the left */
-  border-bottom: 1px solid #eef1f5;
-  padding: 12px 0; /* Adjusted padding for vertical layout */
-
+  flex-direction: row;
+  align-items: flex-start; /* Align to top */
+  border-bottom: 1px solid #2a2a2a; /* Zen: Subtle Border */
+  padding: 12px 0;
 }
 
 /* The label is now styled as a small heading for the field below it */
 .form-group label {
   font-size: 13px;
-  color: #5f6368; /* Darker for better readability */
-  font-weight: 600; /* Bolder */
-  margin-bottom: 4px; /* Space between label and value */
-  /* The fixed width and margin-right are removed */
+  color: #8A8A8A; /* Zen: Secondary Text */
+  font-weight: 600;
+  margin-bottom: 4px;
+  width: 80px; /* Give it a fixed width */
 }
-
-
 
 /* This is the styled text that displays the value */
 .value-display {
   flex-grow: 1;
   font-size: 15px;
-  padding: 0; /* Padding is now on the parent */
-  color: #2c3e50;
+  padding: 0;
+  color: #D1CFC0; /* Zen: Primary Text */
   text-align: left;
   padding-left: 10px;
   margin-bottom: auto;
@@ -375,6 +375,7 @@ const downloadAttachment = async (attachment) => {
 
 .subject-value {
   font-size: 16px;
+  font-weight: bold;
 }
 
 /* Main Email Content */
@@ -383,55 +384,56 @@ const downloadAttachment = async (attachment) => {
   padding: 20px 0;
   font-size: 16px;
   line-height: 1.7;
-  color: #34495e;
-  white-space: pre-wrap;
+  width: 100%;
+  color: #D1CFC0; /* Zen: Primary Text */
+  overflow-wrap: break-word;
   text-align: left;
 }
 
 /* Attachments */
 .attachments-container {
   display: flex; flex-wrap: wrap; gap: 10px;
-  padding: 16px 0; border-top: 1px solid #eef1f5;
+  padding: 16px 0; border-top: 1px solid #2a2a2a;
 }
 .attachment-pill {
   display: flex; align-items: center; gap: 8px;
-  background-color: #f4f6f8; border: 1px solid #eef1f5;
-  color: #566573; font-size: 13px; font-weight: 500;
+  background-color: #333333; border: 1px solid #4a4a4a;
+  color: #D1CFC0; font-size: 13px; font-weight: 500;
   border-radius: 16px; padding: 6px 12px;
 }
 .download-btn {
-  background: none; border: none; cursor: pointer; color: #566573;
+  background: none; border: none; cursor: pointer; color: #D1CFC0;
   transition: color 0.2s;
 }
-.download-btn:hover { color: #3498db; }
+.download-btn:hover { color: #F76F53; } /* Zen: Melon Accent */
 
 /* Footer */
 .email-view-footer {
   display: flex; justify-content: flex-start; align-items: center;
-  padding: 16px 24px; border-top: 1px solid #eef1f5;
-  background-color: #f9fafb; flex-shrink: 0; gap: 16px;
+  padding: 16px 24px; border-top: 1px solid #2a2a2a;
+  background-color: #1E1E1E; flex-shrink: 0; gap: 16px;
 }
 .footer-action-btn {
   display: flex; align-items: center; gap: 8px;
-  background-color: #ffffff; color: #5f6368; border: 1px solid #dadce0;
+  background-color: transparent; color: #D1CFC0; border: 1px solid #4a4a4a;
   padding: 8px 16px; border-radius: 20px; cursor: pointer;
   font-size: 14px; font-weight: 600;
   transition: all 0.2s ease;
 }
 .footer-action-btn:hover {
-  background-color: #f8f9fa;
-  border-color: #c6c6c6;
-  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  background-color: rgba(247, 111, 83, 0.1);
+  border-color: #F76F53;
+  color: #F76F53;
 }
 .decrypt-container {
-    margin-left: auto;
+  margin-left: auto;
 }
 .decrypt-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #8575db;  
-  color: white;
+  background-color: #F76F53; /* Zen: Melon Accent */
+  color: #1E1E1E; /* Dark text for contrast */
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -441,7 +443,7 @@ const downloadAttachment = async (attachment) => {
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 .decrypt-btn:hover {
-  background-color: #9775db;
+  background-color: #e65a40;
 }
 .decrypt-btn:active {
   transform: scale(0.98);
@@ -453,7 +455,7 @@ const downloadAttachment = async (attachment) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0, 0.4);
+  background-color: rgba(0,0,0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -461,12 +463,13 @@ const downloadAttachment = async (attachment) => {
 }
 
 .confirm-dialog {
-  background: #ffffff;
+  background: #1E1E1E;
+  border: 1px solid #2a2a2a;
   padding: 32px;
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   width: 100%;
-  max-width: 420px; /* Slightly wider for the input */
+  max-width: 420px;
   text-align: center;
   transform: scale(1);
 }
@@ -475,12 +478,12 @@ const downloadAttachment = async (attachment) => {
   margin-top: 0;
   margin-bottom: 12px;
   font-size: 20px;
-  color: #34495e;
+  color: #D1CFC0;
 }
 
 .confirm-dialog p {
   margin-bottom: 24px;
-  color: #7f8c8d;
+  color: #8A8A8A;
   font-size: 15px;
   line-height: 1.6;
 }
@@ -489,23 +492,25 @@ const downloadAttachment = async (attachment) => {
 .key-input {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #4a4a4a;
+  background-color: #121212;
+  color: #D1CFC0;
   border-radius: 8px;
   font-size: 16px;
   margin-bottom: 24px;
-  box-sizing: border-box; /* Important for padding */
+  box-sizing: border-box;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .key-input:focus {
-  border-color: #3c5aed;
-  box-shadow: 0 0 0 3px rgba(60, 90, 237, 0.2);
+  border-color: #F76F53;
+  box-shadow: 0 0 0 3px rgba(247, 111, 83, 0.2);
 }
 
 .dialog-actions {
   display: flex;
-  justify-content: flex-end; /* Align buttons to the right */
+  justify-content: flex-end;
   gap: 16px;
 }
 
@@ -520,19 +525,19 @@ const downloadAttachment = async (attachment) => {
 }
 
 .btn-cancel {
-  background-color: #ecf0f1;
-  color: #7f8c8d;
+  background-color: #333333;
+  color: #D1CFC0;
 }
 .btn-cancel:hover {
-  background-color: #e1e5e6;
+  background-color: #4a4a4a;
 }
 
 .btn-confirm {
-  background-color: #3c5aed;
-  color: white;
+  background-color: #F76F53;
+  color: #1E1E1E;
 }
 .btn-confirm:hover {
-  background-color: #344dc5;
+  background-color: #e65a40;
 }
 
 /* Vue Transition Styles */
@@ -554,15 +559,16 @@ const downloadAttachment = async (attachment) => {
   transform: scale(0.95);
 }
 .btn-delete {
-  background-color: #d9534f; /* A standard destructive red */
+  background-color: #c0392b; /* A darker, more muted red */
   color: white;
 }
 .btn-delete:hover {
-  background-color: #c9302c; /* A darker red on hover */
+  background-color: #a93226;
 }
 
 .dialog-actions button:disabled {
-  background-color: #bdc3c7;
+  background-color: #555;
+  color: #8A8A8A;
   cursor: not-allowed;
 }
 </style>

@@ -20,6 +20,7 @@
       />
     </div>
   </transition>
+
 </template>
 
 <script setup>
@@ -32,12 +33,13 @@ defineEmits(['open-compose', 'open-inbox', 'open-sent', 'open-spam', 'open-draft
 <style scoped>
 .sidebar {
   width: 300px;
-  background: #fafafa;
-  color: black;
+  background: #1E1E1E; /* Zen: UI/Surface Background */
+  color: #E1E1E1; /* Zen: Primary Text */
   padding: 32px 24px 24px 24px;
   height: calc(100vh - 56px);
   margin-top: 56px;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  box-shadow: none; /* Removed for a flatter, modern look */
+  border-right: 1px solid #2a2a2a; /* Subtle border for separation */
   border-radius: 0 12px 12px 0;
   display: flex;
   flex-direction: column;
@@ -54,16 +56,24 @@ defineEmits(['open-compose', 'open-inbox', 'open-sent', 'open-spam', 'open-draft
   display: inline-flex;
   gap: 10px;
   align-items: center;
-  background: #3174f1;
-  color: #ffffff;
+  background: transparent; /* Maintains the outline style */
+  color: #d1cfc0; /* Melon accent color */
+  background-color: #363636;
   padding: 8px 14px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-
   border-radius: 25px;
-  border: 3px solid #3174f1;
+  border: 2px solid #363636; /* Melon accent border */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  outline: none;
 }
+
+.sidebar-compose:hover {
+  background: #1f1f1f; /* Fill with melon accent color on hover */
+  color: #fff0df; /* Use a dark color for the text for contrast */
+}
+
 .sidebar-compose i { font-size: 14px; }
 /* When sidebar is present it covers left area; slide transition in App.vue will animate transform */
 </style>
