@@ -78,6 +78,8 @@ import { DownloadAttachment, Decrypt } from '../../wailsjs/go/main/App';
 const showDecryptDialog = ref(false);
 const decryptionKey = ref('');
 
+const secret_key = ref('1234');
+
 const tempSubject = ref('');
 const tempBody = ref('');
 // 1. Accept the new 'section' prop
@@ -101,10 +103,17 @@ const openDecryptDialog = () => {
 
 // Step 2: This new function is called by the dialog's "Decrypt" button
 const handleDecryptConfirm = async (email) => {
-  //if (!decryptionKey.value.trim()) {
-  //  alert("Please enter a decryption key.");
-  //  return;
-  //}
+  if (!decryptionKey.value.trim()) {
+    alert("Please enter a decryption key.");
+    return;
+  }
+
+  if (secret_key.value != decryptionKey.value.trim()) {
+    alert("Decryption Secret Key is wrong.");
+    showDecryptDialog.value = false; // Close the dialog on success
+    return;
+  };
+
 
   //const tempSubject = props.email.subject.trim().replace("Encrypted:", "");
   //const tempBody = props.email.body.trim();
