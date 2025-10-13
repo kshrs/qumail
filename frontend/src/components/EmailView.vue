@@ -5,12 +5,14 @@
         <button class="options-btn" title="Archive"><i class="fa-solid fa-box-archive"></i></button>
         <button class="options-btn" title="Delete"><i class="fa-solid fa-trash"></i></button>
         <button class="options-btn" title="More options"><i class="fa-solid fa-ellipsis-v"></i></button>
-        <button class="send-btn">
+        <div class="decrypt-container">
+        <button v-if="props.email.isEncrypted" class="decrypt-btn" @click="decryptAction(props.email)">
             <span>Decrypt</span>
             <div class="material-symbols-outlined">
                 lock_open_right
             </div>
         </button>
+        </div>
       </div>
     </div>
 
@@ -51,8 +53,11 @@
 </template>
 
 <script setup>
-import { DownloadAttachment } from '../../wailsjs/go/main/App';
+import { ref } from 'vue';
+import { DownloadAttachment, Decrypt } from '../../wailsjs/go/main/App';
 
+const tempSubject = ref('');
+const tempBody = ref('');
 // 1. Accept the new 'section' prop
 const props = defineProps({
     email: {
@@ -66,6 +71,19 @@ const props = defineProps({
 });
 
 defineEmits(['close']);
+
+const decryptAction = async (email) => {
+    tempSubject.value = email.subject.trim().replace("Encrypted:", "");
+    tempBody.value = email.body.trim();
+    try {
+       const decryptedBody = await Decrypt(tempBody.value, tempSubject.value); 
+       console.log("Decrypted Message");
+       console.log(decryptedBody);
+       props.email.body = decryptedBody;
+    } catch (err) {
+        console.log(err);
+    }
+};
 
 // 2. Update the download function to pass the section
 const downloadAttachment = async (attachment) => {
@@ -218,8 +236,10 @@ const downloadAttachment = async (attachment) => {
   border-color: #c6c6c6;
   box-shadow: 0 1px 2px rgba(0,0,0,.05);
 }
-.send-btn {
-  margin-left: auto;
+.decrypt-container {
+    margin-left: auto;
+}
+.decrypt-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -233,10 +253,10 @@ const downloadAttachment = async (attachment) => {
   font-weight: 600;
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
-.send-btn:hover {
+.decrypt-btn:hover {
   background-color: #9775db;
 }
-.send-btn:active {
+.decrypt-btn:active {
   transform: scale(0.98);
 }
 </style>

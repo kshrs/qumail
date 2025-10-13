@@ -171,7 +171,7 @@ func (a *App) FetchEmails(count uint32, section string) ([]Email, error) {
 						}
 
 	if !slices.Contains(valid_section_names, section) {
-		section = "INBOX"
+		section = "INBO"
 	}
 		
 	messages, err := a.mail.GetMessages(section, count)
@@ -244,7 +244,8 @@ func cleanEmailList(emails string) []string {
 	return list
 }
 
-func (a *App) SendEmail(to, cc, bcc string, subject string, body string, attachmentPaths []string) (string, error) {
+func (a *App) SendEmail(to, cc, bcc string, subject string, body string, attachmentPaths []string, encryption_level string) (string, error) {
+
 	if a.mail == nil {
 		return "",errors.New("Connect to a server first")
 	}
@@ -253,15 +254,30 @@ func (a *App) SendEmail(to, cc, bcc string, subject string, body string, attachm
 	ccList := cleanEmailList(cc)
 	bccList := cleanEmailList(bcc)
 
+	key, err := a.GenRand(body)
+	if err != nil {
+		return "", err
+	}
 
-	err := a.mail.SendEmail(toList, ccList, bccList, subject, body, attachmentPaths)
+	var encrypted_body string
+	var encrypted_key string
+	if encryption_level == "OTP" {
+		encrypted_body, encrypted_key, err = a.Encrypt(body, key)
+	if err != nil {
+			return "", err
+		}
+	}
+
+	encrypted_subject := "Encrypted:" + encrypted_key
+
+	err = a.mail.SendEmail(toList, ccList, bccList, encrypted_subject, encrypted_body, attachmentPaths)
 	if err != nil {
 		return "", err
 	}
 	return "Sent Email Successfully", nil
 }
 
-func (a *App) ReadEmail(seqNum uint32) (FullEmail, error) {
+func (a *App) ReadEmail(seqNum uint32, section string) (FullEmail, error) {
 	if a.mail == nil || a.mail.Client == nil{
 		return FullEmail{}, errors.New("Connect to a server first")
 	}
@@ -270,8 +286,8 @@ func (a *App) ReadEmail(seqNum uint32) (FullEmail, error) {
 	seqset.AddNum(seqNum)
 	
 	items := []imap.FetchItem{imap.FetchBodyStructure, imap.FetchEnvelope}
-	section := &imap.BodySectionName{}
-	items = append(items, section.FetchItem())
+	bodySection := &imap.BodySectionName{}
+	items = append(items, bodySection.FetchItem())
 
 	messages := make(chan *imap.Message, 1)
 	if err := a.mail.Client.Fetch(seqset, items, messages); err != nil {
@@ -285,8 +301,9 @@ func (a *App) ReadEmail(seqNum uint32) (FullEmail, error) {
 
 	var fullEmail FullEmail
 	fullEmail.SeqNum = seqNum
+
 	
-	r := msg.GetBody(section)
+	r := msg.GetBody(bodySection)
 	if r == nil {
 		return FullEmail{}, errors.New("could not get message body")
 	}
@@ -304,6 +321,10 @@ func (a *App) ReadEmail(seqNum uint32) (FullEmail, error) {
 	fullEmail.To = header.Get("To")
 	fullEmail.Cc = header.Get("Cc")
 	fullEmail.Subject = header.Get("Subject")
+
+	if strings.Contains(fullEmail.Subject, "Encrypted:") {
+		fullEmail.IsEncrypted = true
+	}
 
 	for {
 		p, err := mr.NextPart() 
@@ -334,7 +355,7 @@ func (a *App) ReadEmail(seqNum uint32) (FullEmail, error) {
 			size, err := io.Copy(ioutil.Discard, p.Body)
 			if err != nil {
 				log.Printf("Could not get attachment size: %v", err)
-				continue
+			continue
 			}
 
 			// Add the attachment metadata to our slice
@@ -428,6 +449,7 @@ func (a *App) PickFiles() ([]string, error) {
 	})
 }
 
+
 func (a *App) ToggleRead(seqNum uint32, currentStateIsRead bool) (string, error) {
 	if a.mail == nil {
 		return "",errors.New("Connect to a server first")
@@ -472,7 +494,7 @@ func (a *App) ToggleStarred(seqNum uint32, currentStateIsStarred bool) (string, 
 
 	err := a.mail.Client.Store(seqset, item, []interface{}{flag}, nil)
 	if err != nil {
-		return "", err
+	return "", err
 	}
 
 	return "Starred Status Updated", nil
@@ -518,7 +540,7 @@ func  (a *App)Decrypt(ciphertextStr string, keyHex string) (string, error) {
     }
     plaintext := make([]byte, len(ciphertext))
     for i := range ciphertext {
-    	plaintext[i] = ciphertext[i] ^ key[i]
+   	plaintext[i] = ciphertext[i] ^ key[i]
     }
     return string(plaintext), nil //Decrypted, error
 }

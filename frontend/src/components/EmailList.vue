@@ -113,6 +113,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  isBackendReady: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 const emit = defineEmits(['viewEmail']);
@@ -184,18 +188,24 @@ const toggleSelect = (email) => {
   email.isSelected = !email.isSelected;
 };
 
-// Use a watcher to reload emails when the section prop changes
-watch(() => props.section, (newSection) => {
-  if (newSection) {
-    loadEmails();
-  }
-});
-
 // Load initial emails only after the backend is ready
 onMounted(() => {
-  EventsOn("backend:ready", () => {
+  // The component is re-mounted for every new section because of the :key.
+  // Just load the emails directly.
+  loadEmails();
+});
+
+// The watcher is still good to have, so you can leave it as is.
+//watch(() => props.section, (newSection) => {
+//  if (newSection) {
+//    loadEmails();
+//  }
+//});
+
+watch(() => props.isBackendReady, (isReady) => {
+  if (isReady) {
     loadEmails();
-  });
+  }
 });
 
 // Expose the loadEmails function for the parent to use

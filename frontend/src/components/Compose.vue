@@ -245,7 +245,8 @@ const sendEmail = async () => {
     bcc.value,
     subject.value,
     body.value,
-    attachmentPaths
+    attachmentPaths,
+    selectedLevel.value.value
     );
     emit('close');
   } catch (err) {

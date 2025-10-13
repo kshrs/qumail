@@ -41,6 +41,7 @@
 
         <EmailList
           v-else
+          :is-backend-ready="isBackendReady"
           :section="sectionMap.get(currentView)" :key="currentView" @viewEmail="openEmailView"
         />
       </div>
@@ -51,6 +52,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { ReadEmail } from '../wailsjs/go/main/App';
+import { EventsOn } from '../wailsjs/runtime/runtime';
 // REMOVED EventsOn: No longer needed here as the child component will handle its own loading
 import Compose from './components/Compose.vue';
 import EmailList from './components/EmailList.vue';
@@ -61,6 +63,7 @@ import EmailView from './components/EmailView.vue';
 
 const sidebarOpen = ref(true);
 const isLoading = ref(false);
+const isBackendReady = ref(false);
 
 // --- MODIFIED STATE MANAGEMENT ---
 const currentView = ref('inbox');   // Holds the simple key like 'inbox', 'sent', 'compose'
@@ -121,6 +124,12 @@ const closeEmailView = () => {
   currentView.value = previousView.value;
 };
 
+onMounted(() => {
+  EventsOn("backend:ready", () => {
+    console.log("Backend is ready!");
+    isBackendReady.value = true;
+  });
+});
 </script>
 
 

@@ -46,6 +46,7 @@ export namespace main {
 	    subject: string;
 	    body: string;
 	    attachments: Attachment[];
+	    isEncrypted: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new FullEmail(source);
@@ -60,6 +61,7 @@ export namespace main {
 	        this.subject = source["subject"];
 	        this.body = source["body"];
 	        this.attachments = this.convertValues(source["attachments"], Attachment);
+	        this.isEncrypted = source["isEncrypted"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

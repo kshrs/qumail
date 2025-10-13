@@ -24,4 +24,5 @@ type FullEmail struct {
 	Subject string `json:"subject"`
 	Body string `json:"body"`
 	Attachments []Attachment `json:"attachments"`
+	IsEncrypted bool `json:"isEncrypted"`
 }
