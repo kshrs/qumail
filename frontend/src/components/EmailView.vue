@@ -6,7 +6,7 @@
         <button class="options-btn" title="Delete"><i class="fa-solid fa-trash"></i></button>
         <button class="options-btn" title="More options"><i class="fa-solid fa-ellipsis-v"></i></button>
         <div class="decrypt-container">
-        <button v-if="props.email.isEncrypted" class="decrypt-btn" @click="decryptAction(props.email)">
+        <button v-if="props.email.isEncrypted" class="decrypt-btn" @click="openDecryptDialog">
             <span>Decrypt</span>
             <div class="material-symbols-outlined">
                 lock_open_right
@@ -47,7 +47,27 @@
           </button>
         </div>
       </div>
-    </div>
+    <Transition name="fade">
+      <div v-if="showDecryptDialog" class="modal-overlay" @click.self="showDecryptDialog = false">
+        <div class="confirm-dialog">
+          <h3>Enter Decryption Key</h3>
+          <p>Please enter the key required to decrypt this message content.</p>
+          
+          <input 
+            type="text" 
+            v-model="decryptionKey" 
+            class="key-input" 
+            placeholder="Enter your key..."
+            @keyup.enter="handleDecryptConfirm(props.email)"
+          />
+
+          <div class="dialog-actions">
+            <button class="btn-cancel" @click="showDecryptDialog = false">Cancel</button>
+            <button class="btn-confirm" @click="handleDecryptConfirm(props.email)">Decrypt</button>
+          </div>
+        </div>
+      </div>
+    </Transition>   </div>
 
   </div>
 </template>
@@ -55,6 +75,8 @@
 <script setup>
 import { ref } from 'vue';
 import { DownloadAttachment, Decrypt } from '../../wailsjs/go/main/App';
+const showDecryptDialog = ref(false);
+const decryptionKey = ref('');
 
 const tempSubject = ref('');
 const tempBody = ref('');
@@ -71,6 +93,31 @@ const props = defineProps({
 });
 
 defineEmits(['close']);
+
+const openDecryptDialog = () => {
+  decryptionKey.value = ''; // Clear previous key
+  showDecryptDialog.value = true;
+};
+
+// Step 2: This new function is called by the dialog's "Decrypt" button
+const handleDecryptConfirm = async (email) => {
+  //if (!decryptionKey.value.trim()) {
+  //  alert("Please enter a decryption key.");
+  //  return;
+  //}
+
+  //const tempSubject = props.email.subject.trim().replace("Encrypted:", "");
+  //const tempBody = props.email.body.trim();
+  
+  try {
+    decryptAction(email);
+    showDecryptDialog.value = false; // Close the dialog on success
+  } catch (err) {
+    console.error(err);
+    alert(`Decryption failed: ${err}`); // Show error to the user
+    showDecryptDialog.value = false; // Also close dialog on failure
+  }
+};
 
 const decryptAction = async (email) => {
     tempSubject.value = email.subject.trim().replace("Encrypted:", "");
@@ -258,5 +305,112 @@ const downloadAttachment = async (attachment) => {
 }
 .decrypt-btn:active {
   transform: scale(0.98);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirm-dialog {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 420px; /* Slightly wider for the input */
+  text-align: center;
+  transform: scale(1);
+}
+
+.confirm-dialog h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 20px;
+  color: #34495e;
+}
+
+.confirm-dialog p {
+  margin-bottom: 24px;
+  color: #7f8c8d;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* NEW: Style for the key input field */
+.key-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 24px;
+  box-sizing: border-box; /* Important for padding */
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.key-input:focus {
+  border-color: #3c5aed;
+  box-shadow: 0 0 0 3px rgba(60, 90, 237, 0.2);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 16px;
+}
+
+.dialog-actions button {
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel {
+  background-color: #ecf0f1;
+  color: #7f8c8d;
+}
+.btn-cancel:hover {
+  background-color: #e1e5e6;
+}
+
+.btn-confirm {
+  background-color: #3c5aed;
+  color: white;
+}
+.btn-confirm:hover {
+  background-color: #344dc5;
+}
+
+/* Vue Transition Styles */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-active .confirm-dialog,
+.fade-leave-active .confirm-dialog {
+  transition: transform 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-from .confirm-dialog,
+.fade-leave-to .confirm-dialog {
+  transform: scale(0.95);
 }
 </style>
