@@ -545,6 +545,38 @@ func  (a *App)Decrypt(ciphertextStr string, keyHex string) (string, error) {
     return string(plaintext), nil //Decrypted, error
 }
 
+
+// DeleteSingleEmail moves one email to the Trash folder.
+func (a *App) DeleteSingleEmail(seqNum uint32, section string) (string, error) {
+	if a.mail == nil || a.mail.Client == nil {
+		return "", errors.New("not connected to a server")
+	}
+
+	// 1. Select the mailbox where the email currently is (e.g., "INBOX")
+	if _, err := a.mail.Client.Select(section, false); err != nil {
+		return "", fmt.Errorf("could not select mailbox '%s': %w", section, err)
+	}
+
+	// 2. Create a sequence set for the single email ID.
+	seqset := new(imap.SeqSet)
+	seqset.AddNum(seqNum)
+	
+	// 3. The destination folder is [Gmail]/Trash.
+	trashFolder := "[Gmail]/Trash"
+
+	// 4. Move the email.
+	if err := a.mail.Client.Move(seqset, trashFolder); err != nil {
+		return "", err
+	}
+    
+    // 5. Expunge the mailbox to finalize the deletion from the current view.
+    if err := a.mail.Client.Expunge(nil); err != nil {
+        return "", err
+    }
+
+	return "Email moved to Trash.", nil
+}
+
 func (a *App) shutdown(ctx context.Context) {
 	if a.mail != nil {
 		a.mail.Disconnect()

@@ -6,6 +6,10 @@ export function Decrypt(arg1, arg2) {
   return window['go']['main']['App']['Decrypt'](arg1, arg2);
 }
 
+export function DeleteSingleEmail(arg1, arg2) {
+  return window['go']['main']['App']['DeleteSingleEmail'](arg1, arg2);
+}
+
 export function DownloadAttachment(arg1, arg2, arg3) {
   return window['go']['main']['App']['DownloadAttachment'](arg1, arg2, arg3);
 }

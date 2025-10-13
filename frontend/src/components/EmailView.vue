@@ -3,7 +3,7 @@
     <div class="email-view-header">
       <button @click="$emit('close')" class="back-btn" title="Back to Inbox"> <i class="fa-solid fa-arrow-left"></i> </button> <div class="header-actions">
         <button class="options-btn" title="Archive"><i class="fa-solid fa-box-archive"></i></button>
-        <button class="options-btn" title="Delete"><i class="fa-solid fa-trash"></i></button>
+        <button class="options-btn" title="Delete" @click="handleDelete(props.email)"><i class="fa-solid fa-trash"></i></button>
         <button class="options-btn" title="More options"><i class="fa-solid fa-ellipsis-v"></i></button>
         <div class="decrypt-container">
         <button v-if="props.email.isEncrypted" class="decrypt-btn" @click="openDecryptDialog">
@@ -68,16 +68,28 @@
         </div>
       </div>
     </Transition>   </div>
+<Transition name="fade">
+  <div v-if="showDeleteDialog" class="modal-overlay" @click.self="showDeleteDialog = false">
+    <div class="confirm-dialog">
+      <h3>Move to Trash?</h3>
+      <p>Are you sure you want to move this conversation to the trash?</p>
+      <div class="dialog-actions">
+        <button class="btn-cancel" @click="showDeleteDialog = false">Cancel</button>
+        <button class="btn-confirm btn-delete" @click="confirmDeleteAction">Move to Trash</button>
+      </div>
+    </div>
+  </div>
+</Transition>
 
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { DownloadAttachment, Decrypt } from '../../wailsjs/go/main/App';
+import { DownloadAttachment, Decrypt, DeleteSingleEmail } from '../../wailsjs/go/main/App';
 const showDecryptDialog = ref(false);
 const decryptionKey = ref('');
-
+const showDeleteDialog = ref(false);
 const secret_key = ref('1234');
 
 const tempSubject = ref('');
@@ -94,7 +106,25 @@ const props = defineProps({
     }
 });
 
-defineEmits(['close']);
+
+function handleDelete() {
+  showDeleteDialog.value = true;
+}
+
+async function confirmDeleteAction() {
+  try {
+    const result = await DeleteSingleEmail(props.email.seqNum, props.section);
+    console.log(result); // Log success
+    showDeleteDialog.value = false; // Close the dialog
+    emit('close'); // Go back to the inbox
+  } catch (err) {
+    alert(`Error deleting email: ${err}`); // Use a simple alert for errors
+    showDeleteDialog.value = false;
+  }
+}
+
+const emit = defineEmits(['close']);
+
 
 const openDecryptDialog = () => {
   decryptionKey.value = ''; // Clear previous key
@@ -421,5 +451,12 @@ const downloadAttachment = async (attachment) => {
 .fade-enter-from .confirm-dialog,
 .fade-leave-to .confirm-dialog {
   transform: scale(0.95);
+}
+.btn-delete {
+  background-color: #d9534f; /* A standard destructive red */
+  color: white;
+}
+.btn-delete:hover {
+  background-color: #c9302c; /* A darker red on hover */
 }
 </style>

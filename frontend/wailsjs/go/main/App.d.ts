@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function Decrypt(arg1:string,arg2:string):Promise<string>;
 
+export function DeleteSingleEmail(arg1:number,arg2:string):Promise<string>;
+
 export function DownloadAttachment(arg1:number,arg2:string,arg3:string):Promise<string>;
 
 export function Encrypt(arg1:string,arg2:Array<number>):Promise<string>;
