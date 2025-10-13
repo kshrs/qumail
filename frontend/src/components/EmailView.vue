@@ -6,7 +6,7 @@
         <button class="options-btn" title="Delete" @click="handleDelete(props.email)"><i class="fa-solid fa-trash"></i></button>
         <button class="options-btn" title="More options"><i class="fa-solid fa-ellipsis-v"></i></button>
         <div class="decrypt-container">
-        <button v-if="props.email.isEncrypted" class="decrypt-btn" @click="openDecryptDialog">
+        <button v-if="props.email.isEncrypted" class="decrypt-btn" @click="startOtpVerification">
             <span>Decrypt</span>
             <div class="material-symbols-outlined">
                 lock_open_right
@@ -48,6 +48,49 @@
         </div>
       </div>
     <Transition name="fade">
+      <div v-if="showOtpDialog" class="modal-overlay" @click.self="showOtpDialog = false">
+        <div class="confirm-dialog">
+          
+          <div v-if="otpStep === 'enterPhone'">
+            <h3>Two-Factor Authentication</h3>
+            <p>For security, please enter your phone number to receive a verification code.</p>
+            <input 
+              type="tel" 
+              v-model="phoneNumber" 
+              class="key-input" 
+              placeholder="+1234567890 (E.164 format)"
+            />
+            <div class="dialog-actions">
+              <button class="btn-cancel" @click="showOtpDialog = false">Cancel</button>
+              <button class="btn-confirm" @click="handleSendCode" :disabled="isLoading">
+                {{ isLoading ? 'Sending...' : 'Send Code' }}
+              </button>
+            </div>
+          </div>
+
+          <div v-if="otpStep === 'enterCode'">
+            <h3>Check Your Phone</h3>
+            <p>We've sent a 5-digit code to <strong>{{ phoneNumber }}</strong>. Please enter it below.</p>
+            <input 
+              type="text" 
+              v-model="otpCode" 
+              class="key-input" 
+              placeholder="12345"
+              maxlength="6"
+              @keyup.enter="handleVerifyCode"
+            />
+            <div class="dialog-actions">
+              <button class="btn-cancel" @click="otpStep = 'enterPhone'">Back</button>
+              <button class="btn-confirm" @click="handleVerifyCode" :disabled="isLoading">
+                {{ isLoading ? 'Verifying...' : 'Verify & Decrypt' }}
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </Transition>
+    <Transition name="fade">
       <div v-if="showDecryptDialog" class="modal-overlay" @click.self="showDecryptDialog = false">
         <div class="confirm-dialog">
           <h3>Enter Decryption Key</h3>
@@ -86,14 +129,22 @@
 
 <script setup>
 import { ref } from 'vue';
-import { DownloadAttachment, Decrypt, DeleteSingleEmail } from '../../wailsjs/go/main/App';
+import { DownloadAttachment, Decrypt, DeleteSingleEmail, SendVerificationCode, CheckVerificationCode } from '../../wailsjs/go/main/App';
 const showDecryptDialog = ref(false);
 const decryptionKey = ref('');
 const showDeleteDialog = ref(false);
 const secret_key = ref('1234');
 
+
+const showOtpDialog = ref(false);
+const otpStep = ref('enterPhone'); // Controls which part of the dialog is visible
+const phoneNumber = ref('');
+const otpCode = ref('');
+const isLoading = ref(false);
+
 const tempSubject = ref('');
 const tempBody = ref('');
+
 // 1. Accept the new 'section' prop
 const props = defineProps({
     email: {
@@ -105,6 +156,56 @@ const props = defineProps({
         required: true,
     }
 });
+
+const startOtpVerification = () => {
+  // Reset state before showing
+  otpStep.value = 'enterPhone';
+  phoneNumber.value = '';
+  otpCode.value = '';
+  showOtpDialog.value = true;
+};
+
+const handleSendCode = async () => {
+  if (!phoneNumber.value.trim()) {
+    alert('Please enter a valid phone number.');
+    return;
+  }
+  isLoading.value = true;
+  try {
+    console.log(phoneNumber.value);
+    const result = await SendVerificationCode(phoneNumber.value);
+    console.log(result); // "Verification code sent successfully."
+    otpStep.value = 'enterCode'; // Move to the next step
+  } catch (err) {
+    alert(`Failed to send code: ${err}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const handleVerifyCode = async () => {
+  if (!otpCode.value.trim()) {
+    alert('Please enter the verification code.');
+    return;
+  }
+  isLoading.value = true;
+  try {
+    const isVerified = await CheckVerificationCode(phoneNumber.value, otpCode.value);
+    
+    if (isVerified) {
+      showOtpDialog.value = false;
+      // Now you can call your original decryption logic
+      // For simplicity, let's assume the key is handled by the backend now
+      openDecryptDialog(); 
+    } else {
+      alert('Verification failed. The code is incorrect.');
+    }
+  } catch (err) {
+    alert(`Verification error: ${err}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 
 function handleDelete() {
@@ -458,5 +559,10 @@ const downloadAttachment = async (attachment) => {
 }
 .btn-delete:hover {
   background-color: #c9302c; /* A darker red on hover */
+}
+
+.dialog-actions button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
 }
 </style>

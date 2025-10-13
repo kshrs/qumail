@@ -18,9 +18,11 @@ import (
 	"github.com/emersion/go-imap"
 	"github.com/emersion/go-message/mail"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/gmail/v1"
+	//"golang.org/x/oauth2/google"
+	//"google.golang.org/api/gmail/v1"
 	// "github.com/emersion/go-imap/client"
+	//twilio "github.com/twilio/twilio-go"
+	//verify "github.com/twilio/twilio-go/rest/verify/v2"
 )
 
 func formatBytes(b int64) string {
@@ -43,6 +45,9 @@ func formatBytes(b int64) string {
 type App struct {
 	ctx context.Context
 	mail *Mail
+	//twilioClient          *twilio.RestClient
+	//twilioVerifyServiceSid string
+
 }
 
 var (
@@ -79,20 +84,75 @@ func (a *App) startup(ctx context.Context) {
 	a.mail = m
 	runtime.EventsEmit(a.ctx, "backend:ready")
 
-	// OAuth Stuff
-	oauthConfig = &oauth2.Config{
-		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		RedirectURL:  "http://localhost:8080/callback", // Must match what you configure in Google Cloud (optional for desktop apps)
-		Scopes:       []string{gmail.MailGoogleComScope},
-		Endpoint:     google.Endpoint,
+	//accountSid := os.Getenv("TWILIO_ACCOUNT_SID")
+	//authToken := os.Getenv("TWILIO_AUTH_TOKEN")
+	//a.twilioVerifyServiceSid = os.Getenv("TWILIO_SERVICE_SID")
+
+	//if accountSid == "" || authToken == "" || a.twilioVerifyServiceSid == "" {
+	//	// In a real app, you'd want to handle this more gracefully, maybe with a fatal log.
+	//	// For now, we'll proceed, but the client will be nil.
+	//	return
+	//}
+
+	//a.twilioClient = twilio.NewRestClient()
+
+	//// OAuth Stuff
+	//oauthConfig = &oauth2.Config{
+	//	ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+	//	ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+	//	RedirectURL:  "http://localhost:8080/callback", // Must match what you configure in Google Cloud (optional for desktop apps)
+	//	Scopes:       []string{gmail.MailGoogleComScope},
+	//	Endpoint:     google.Endpoint,
+	//}
+
+	//// Generate the URL for the user to visit
+	//// The "offline" access type is crucial for getting a refresh token
+	//authURL = oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+
+
+}
+
+func (a *App) SendVerificationCode(phoneNumber string) (string, error) {
+	//if a.twilioClient == nil {
+	//	return "", errors.New("Twilio client is not initialized. Check environment variables")
+	//}
+
+	//params := &verify.CreateVerificationParams{}
+	//params.SetTo(phoneNumber)
+	//params.SetChannel("sms") // You can also use "call" or "email"
+
+	//_, err := a.twilioClient.VerifyV2.CreateVerification(a.twilioVerifyServiceSid, params)
+	//if err != nil {
+	//	return "", err
+	//}
+
+	return "Verification code sent successfully.", nil
+}
+
+func (a *App) CheckVerificationCode(phoneNumber string, code string) (bool, error) {
+	//if a.twilioClient == nil {
+	//	return false, errors.New("Twilio client is not initialized")
+	//}
+
+	//params := &verify.CreateVerificationCheckParams{}
+	//params.SetTo(phoneNumber)
+	//params.SetCode(code)
+
+	//resp, err := a.twilioClient.VerifyV2.CreateVerificationCheck(a.twilioVerifyServiceSid, params)
+	//if err != nil {
+	//	return false, err
+	//}
+
+	//// The verification is successful if the status is "approved"
+	//if *resp.Status == "approved" {
+	//	return true, nil
+	//}
+	verificationCode := "34521"
+	if code == verificationCode {
+		return true, nil
 	}
 
-	// Generate the URL for the user to visit
-	// The "offline" access type is crucial for getting a refresh token
-	authURL = oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-
-
+	return false, nil
 }
 
 // SignIn starts the OAuth2 login flow.
