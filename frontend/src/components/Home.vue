@@ -87,22 +87,24 @@ function handleOutlookSignIn() {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  max-height: 600vh;
   background-color: #121212;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* App name styling (outside the card) */
 .logo {
-  font-size: 6rem; /* Bigger font size */
+  font-size: 5rem; /* Bigger font size */
   font-weight: 700;
   font-family: Junicode,serif;
   color: #E1E1E1;
   margin-bottom: 32px; /* Space between logo and card */
   text-align: center;
+  padding-top: 30px;
 }
 
 .logo-explanation {
-  font-size: 4rem; /* Bigger font size */
+  font-size: 3rem; /* Bigger font size */
   font-weight: 700;
   font-family: Junicode-italic,serif;
   color: #E1E1E1;

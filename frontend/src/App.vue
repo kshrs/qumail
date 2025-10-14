@@ -26,6 +26,8 @@
       <TopBar class="topbar" @toggle-sidebar="toggleSidebar" />
 
       <div id="app">
+        <Home />
+        <!--
         <ToolBar />
 
         <Compose
@@ -44,6 +46,7 @@
           :is-backend-ready="isBackendReady"
           :section="sectionMap.get(currentView)" :key="currentView" @viewEmail="openEmailView"
         />
+        -->
       </div>
     </div>
   </div>
