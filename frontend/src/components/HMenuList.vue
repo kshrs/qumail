@@ -40,7 +40,7 @@
     account_circle
     </span>
     <span class="material-symbols-outlined">
-    <label> Kishor</label>
+    <label> ProjectBase</label>
     </span>
   </div>
 </template>
