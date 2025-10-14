@@ -192,7 +192,11 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 .plugins-list { display:flex; flex-direction:column; gap:8px; }
 .plugin-item { display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-radius:6px; transition: background-color 0.2s ease; }
 .plugin-item:hover { background: rgba(247, 111, 83, 0.1); } /* Zen: Melon Accent Hover */
-.small { background: #363636; color:#d1cfc0; border:none; padding:6px 8px; border-radius:6px; cursor:pointer }
+.small { background: #F59253; color:#111111; font-weight: bold; border:none; padding:6px 8px; border-radius:6px; cursor:pointer }
+.small:hover {
+    background: #F56F59;
+
+}
 
 /* dialog removed: using inline add inside popover */
 .add-dialog-backdrop {
