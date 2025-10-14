@@ -26,8 +26,6 @@
       <TopBar class="topbar" @toggle-sidebar="toggleSidebar" />
 
       <div id="app">
-        <Home />
-        <!--
         <ToolBar />
 
         <Compose
@@ -46,7 +44,6 @@
           :is-backend-ready="isBackendReady"
           :section="sectionMap.get(currentView)" :key="currentView" @viewEmail="openEmailView"
         />
-        -->
       </div>
     </div>
   </div>
@@ -187,6 +184,11 @@ body {
   width: 100%;
   position: relative;
   overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
+  scrollbar-width: none !important;
 }
 
 .topbar {
