@@ -70,8 +70,7 @@ defineEmits(['open-compose', 'open-inbox', 'open-sent', 'open-spam', 'open-draft
 }
 
 .sidebar-compose:hover {
-  background: #1f1f1f; /* Fill with melon accent color on hover */
-  color: #fff0df; /* Use a dark color for the text for contrast */
+  color: #F79253;
 }
 
 .sidebar-compose i { font-size: 14px; }

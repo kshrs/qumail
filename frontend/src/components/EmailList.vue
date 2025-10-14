@@ -215,6 +215,9 @@ defineExpose({
 </script>
 
 <style scoped>
+.main-emaillist {
+    border-radius: 25px;
+}
 .inbox-container {
   display: flex;
   flex-direction: column;

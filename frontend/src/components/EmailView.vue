@@ -47,6 +47,8 @@
           </button>
         </div>
       </div>
+      <div class="email-footer">
+      </div>
     <Transition name="fade">
       <div v-if="showOtpDialog" class="modal-overlay" @click.self="showOtpDialog = false">
         <div class="confirm-dialog">
@@ -381,13 +383,23 @@ const downloadAttachment = async (attachment) => {
 /* Main Email Content */
 .email-body-content {
   flex-grow: 1;
-  padding: 20px 0;
+  margin-top: 15px;
+  padding: 20px 15px;
   font-size: 16px;
+  min-height: 500px;
+  max-height: 700px;
   line-height: 1.7;
   width: 100%;
   color: #D1CFC0; /* Zen: Primary Text */
   overflow-wrap: break-word;
   text-align: left;
+  background-color: #111111;
+  border-radius: 15px;
+}
+
+.email-footer {
+    background: #1e1e1e1;
+    margin-bottom: 15px;
 }
 
 /* Attachments */
@@ -405,7 +417,7 @@ const downloadAttachment = async (attachment) => {
   background: none; border: none; cursor: pointer; color: #D1CFC0;
   transition: color 0.2s;
 }
-.download-btn:hover { color: #F76F53; } /* Zen: Melon Accent */
+.download-btn:hover { color: #F79253; } /* Zen: Melon Accent */
 
 /* Footer */
 .email-view-footer {
@@ -422,8 +434,8 @@ const downloadAttachment = async (attachment) => {
 }
 .footer-action-btn:hover {
   background-color: rgba(247, 111, 83, 0.1);
-  border-color: #F76F53;
-  color: #F76F53;
+  border-color: #F79253;
+  color: #F79253;
 }
 .decrypt-container {
   margin-left: auto;
@@ -432,13 +444,13 @@ const downloadAttachment = async (attachment) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #F76F53; /* Zen: Melon Accent */
+  background-color: #F79253;
   color: #1E1E1E; /* Dark text for contrast */
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
@@ -504,7 +516,7 @@ const downloadAttachment = async (attachment) => {
 }
 
 .key-input:focus {
-  border-color: #F76F53;
+  border-color: #F79253;
   box-shadow: 0 0 0 3px rgba(247, 111, 83, 0.2);
 }
 
@@ -533,7 +545,7 @@ const downloadAttachment = async (attachment) => {
 }
 
 .btn-confirm {
-  background-color: #F76F53;
+  background-color: #F79253;
   color: #1E1E1E;
 }
 .btn-confirm:hover {

@@ -328,7 +328,7 @@ const sendEmail = async () => {
   color: #555;
 }
 .cc-bcc span.active {
-  color: #F76F53; /* Zen: Melon Accent */
+  color: #F79253; /* Zen: Melon Accent */
 }
 .cc-bcc {
   display: flex;
@@ -343,7 +343,7 @@ const sendEmail = async () => {
   transition: color 0.2s ease;
 }
 .cc-bcc span:hover {
-  color: #F76F53; /* Zen: Melon Accent */
+  color: #F79253; /* Zen: Melon Accent */
 }
 .email-body {
   flex-grow: 1;
@@ -419,7 +419,7 @@ const sendEmail = async () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #F76F53; /* Zen: Melon Accent */
+  background-color: #F79253; /* Zen: Melon Accent */
   color: #363636; /* Dark text for contrast */
   border: none;
   padding: 10px 20px;
@@ -524,7 +524,7 @@ const sendEmail = async () => {
 }
 
 .btn-confirm {
-  background-color: #F76F53; /* Zen: Melon Accent */
+  background-color: #F79253; /* Zen: Melon Accent */
   color: #1E1E1E;
 }
 .btn-confirm:hover {

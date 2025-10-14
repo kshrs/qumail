@@ -93,7 +93,7 @@ defineEmits(['open-inbox', 'open-sent', 'open-drafts', 'open-spam', 'open-trash'
   background: #363636; /* Slightly more prominent accent */
   color: #d1cfc0; /* Zen Accent Color */
   font-weight: 600; /* Make the text bold */
-  border-left: 4px solid #f76f53;
+  border-left: 4px solid #f79253;
 }
 
 .List li:focus-within {

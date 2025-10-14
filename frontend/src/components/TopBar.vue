@@ -155,7 +155,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
   cursor: pointer;
   font-weight: bold;
   transition: color 0.2s ease;
-  background-color: #363636;
+  background-color: #111111;
   border-radius: 4px;
   padding: 5px 7px;
   margin: 0px 5px;
@@ -164,13 +164,13 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
   margin-right: 0;
 }
 .top-btn:hover {
-  color: #F76F53; /* Zen: Melon Accent */
+  color: #F79253; /* Zen: Melon Accent */
   text-decoration: none;
 }
 
 /* NEW: Added an active state style for the selected button */
 .top-btn.active {
-  color: #F76F53;
+  color: #F79253;
 }
 
 .plugins-wrapper {
@@ -233,7 +233,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 
 .available-item:hover {
   background: rgba(247, 111, 83, 0.1);
-  color: #F76F53;
+  color: #F79253;
 }
 
 .icon-action {
