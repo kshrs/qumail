@@ -42,7 +42,10 @@
           <div class="available-item">Ai Draft <button class="small" @click="addPluginFromDialog('Plugin 1')">Add</button></div>
           <div class="available-item">Schedular <button class="small" @click="addPluginFromDialog('Plugin 2')">Add</button></div>
         </div>
-        <div style="text-align:right;margin-top:12px;padding-right: 120px;"><button @click="closeAddDialog" class="small">Close</button></div>
+        <div class="menus" style="gap: 50px; align-items: center;">
+        <div style="text-align:left;margin-top:12px;padding-left: 60px;"><button @click="closeAddDialog" class="small">Close</button></div>
+        <div style="text-align:right;margin-top:12px;padding-right: 60px;"><button @click="closeAddDialog" class="small">Install</button></div>
+        </div>
       </div>
     </div>
     </Transition>
@@ -238,6 +241,10 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 .available-item:hover {
   background: rgba(247, 111, 83, 0.1);
   color: #F79253;
+}
+.menus {
+    display: flex;
+    flex-direction: row;
 }
 
 .icon-action {
