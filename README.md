@@ -143,3 +143,6 @@ The modular architecture allows for future expansion into a complete application
 
 - [ETSI GS QKD 014](https://www.etsi.org/deliver/etsi_gs/QKD/001_099/014/01.01.01_60/gs_qkd014v010101p.pdf) - QKD Protocol and Data Format
 - [Smart India Hackathon Problem Statements](https://www.sih.gov.in/sih2025PS)
+
+### Note
+- The initial login is broken and currently working from a .env file
